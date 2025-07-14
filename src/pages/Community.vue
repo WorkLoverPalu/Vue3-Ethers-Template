@@ -69,7 +69,7 @@
 
 <script setup lang="ts">
 import { reactive } from 'vue'
-import { userStore, communityStore } from '@/stores'
+import { userStore, communityStore } from '@/stores/date'
 import { t } from '@/utils/i18n'
 import { formatNumber } from '@/utils/helpers'
 

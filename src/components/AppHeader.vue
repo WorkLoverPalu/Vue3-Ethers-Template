@@ -11,7 +11,7 @@
           <option value="en">English</option>
         </select>
         <button class="connect-btn" @click="handleWalletConnection">
-          {{ walletStore.connected ? t('header.connected') : t('header.connect') }}
+          {{ walletStore.isConnected ? t('header.connected') : t('header.connect') }}
         </button>
       </div>
     </div>
@@ -21,10 +21,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { t, changeLanguage } from '@/utils/i18n'
-import { useWallet } from '@/composables/useWallet'
+import { useEthers } from '@/composables/useWallet'
 import type { Language } from '@/types'
 
-const { connectWallet, walletStore } = useWallet()
+const { connectWallet, walletStore } = useEthers()
 const selectedLang = ref<Language>('zh')
 
 const handleLanguageChange = (): void => {
@@ -32,7 +32,7 @@ const handleLanguageChange = (): void => {
 }
 
 const handleWalletConnection = async (): Promise<void> => {
-  if (!walletStore.connected) {
+  if (!walletStore.isConnected) {
     try {
       await connectWallet()
     } catch (error) {

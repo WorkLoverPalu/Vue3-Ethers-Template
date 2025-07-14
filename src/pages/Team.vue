@@ -86,7 +86,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { teamStore, userStore } from '@/stores'
+import { teamStore, userStore } from '@/stores/date'
 import { t, currentLang } from '@/utils/i18n'
 import { formatDate, copyToClipboard, formatNumber, sleep } from '@/utils/helpers'
 import AppButton from '@/components/AppButton.vue'

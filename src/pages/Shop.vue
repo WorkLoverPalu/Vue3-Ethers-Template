@@ -48,18 +48,18 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { investmentStore } from '@/stores'
+import { investmentStore } from '@/stores/date'
 import { t } from '@/utils/i18n'
 import { formatNumber, sleep } from '@/utils/helpers'
 import AppButton from '@/components/AppButton.vue'
 import type { InvestmentPlan } from '@/types'
-import { useWallet } from '@/composables/useWallet'
+import { useEthers } from '@/composables/useWallet'
 
-const { walletStore } = useWallet()
+const { walletState } = useEthers()
 const purchaseLoading = ref<string | null>(null)
 
 const purchasePlan = async (plan: InvestmentPlan): Promise<void> => {
-  if (!walletStore.connected) {
+  if (!walletState.isConnected) {
     alert(t('header.connect'))
     return
   }

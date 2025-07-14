@@ -78,7 +78,7 @@
 </template>
 
 <script setup lang="ts">
-import { userStore } from '@/stores'
+import { userStore } from '@/stores/date'
 import { t } from '@/utils/i18n'
 import { formatNumber } from '@/utils/helpers'
 import { useRouter } from 'vue-router'
