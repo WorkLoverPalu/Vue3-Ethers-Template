@@ -3,7 +3,7 @@
     <div class="wallet-header">
       <h1 class="page-title">{{ t('wallet.title') }}</h1>
     </div>
-    
+
     <div class="wallet-content">
       <!-- Personal Earnings Section -->
       <div class="earnings-section">
@@ -17,7 +17,7 @@
             <span class="withdrawal-date">2024-01-15</span>
           </div>
         </div>
-        
+
         <div class="earnings-cards">
           <div class="earning-card">
             <div class="card-header">
@@ -27,7 +27,7 @@
             <div class="earning-amount green">{{ formatNumber(userStore.stats.availableEarnings) }}</div>
             <div class="earning-unit">TIG</div>
           </div>
-          
+
           <div class="earning-card">
             <div class="card-header">
               <span class="card-icon">✅</span>
@@ -37,13 +37,9 @@
             <div class="earning-unit">TIG</div>
           </div>
         </div>
-        
-        <AppButton 
-          variant="success" 
-          class="withdraw-btn"
-          :loading="withdrawLoading === 'personal'"
-          @click="withdrawEarnings('personal')"
-        >
+
+        <AppButton variant="success" class="withdraw-btn" :loading="withdrawLoading === 'personal'"
+          @click="withdrawEarnings('personal')">
           {{ t('wallet.withdraw') }} {{ formatNumber(userStore.stats.availableEarnings) }} TIG
         </AppButton>
       </div>
@@ -60,7 +56,7 @@
             <span class="withdrawal-date">2024-01-12</span>
           </div>
         </div>
-        
+
         <div class="earnings-cards">
           <div class="earning-card">
             <div class="card-header">
@@ -70,7 +66,7 @@
             <div class="earning-amount purple">{{ formatNumber(userStore.stats.teamEarnings) }}</div>
             <div class="earning-unit">TIG</div>
           </div>
-          
+
           <div class="earning-card">
             <div class="card-header">
               <span class="card-icon">✅</span>
@@ -80,13 +76,9 @@
             <div class="earning-unit">TIG</div>
           </div>
         </div>
-        
-        <AppButton 
-          variant="purple" 
-          class="withdraw-btn"
-          :loading="withdrawLoading === 'team'"
-          @click="withdrawEarnings('team')"
-        >
+
+        <AppButton variant="purple" class="withdraw-btn" :loading="withdrawLoading === 'team'"
+          @click="withdrawEarnings('team')">
           {{ t('wallet.withdraw') }} {{ formatNumber(userStore.stats.teamEarnings) }} TIG
         </AppButton>
       </div>
@@ -113,7 +105,7 @@
               <div class="record-date">{{ formatDate(record.date) }}</div>
             </div>
             <div class="record-amount">+{{ formatNumber(record.amount) }} TIG</div>
-            <div class="record-status">{{ t('wallet.completed') }}</div>
+            <!-- <div class="record-status">{{ t('wallet.completed') }}</div> -->
           </div>
         </div>
       </div>
@@ -158,7 +150,7 @@ const withdrawalRecords = reactive([
 
 const withdrawEarnings = async (type: WithdrawType): Promise<void> => {
   withdrawLoading.value = type
-  
+
   try {
     // Simulate withdrawal process
     await sleep(2000)
@@ -231,6 +223,7 @@ const withdrawEarnings = async (type: WithdrawType): Promise<void> => {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  text-align: right;
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.7);
 }
@@ -288,7 +281,7 @@ const withdrawEarnings = async (type: WithdrawType): Promise<void> => {
 }
 
 .earning-amount.purple {
-  color: #e91e63;
+  color: rgb(192 132 252);
 }
 
 .earning-unit {
@@ -417,40 +410,40 @@ const withdrawEarnings = async (type: WithdrawType): Promise<void> => {
   .wallet-header {
     padding: 1rem;
   }
-  
+
   .wallet-content {
     padding: 0 0.5rem 2rem;
     gap: 1rem;
   }
-  
+
   .earnings-section {
     padding: 1.25rem;
   }
-  
+
   .earnings-cards {
     gap: 0.75rem;
   }
-  
+
   .earning-card {
     padding: 1rem;
   }
-  
+
   .earning-amount {
     font-size: 1.5rem;
   }
-  
+
   .section-header {
-    flex-direction: column;
+    /* flex-direction: column; */
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .last-withdrawal {
     align-items: flex-start;
   }
-  
+
   .record-item {
-    flex-direction: column;
+    /* flex-direction: column; */
     align-items: flex-start;
     gap: 0.5rem;
   }

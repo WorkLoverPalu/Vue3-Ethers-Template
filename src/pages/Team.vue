@@ -113,7 +113,7 @@ const withdrawTeamEarnings = async (): Promise<void> => {
 <style scoped>
 .team-page {
   min-height: 100vh;
-  padding: 0;
+  padding: 0 0 20px 0;
 }
 
 .team-content {
@@ -147,7 +147,7 @@ const withdrawTeamEarnings = async (): Promise<void> => {
 
 .stat-item {
   text-align: center;
-  flex: 1;
+  flex: 0.3;
 }
 
 .stat-value {
@@ -278,11 +278,12 @@ const withdrawTeamEarnings = async (): Promise<void> => {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  /* outline: solid 1px red; */
 }
 
 .member-level {
-  background: linear-gradient(45deg, #00d4ff, #5b86e5);
-  color: white;
+  /* background: linear-gradient(45deg, #00d4ff, #5b86e5); */
+  color: #00d4ff;
   padding: 0.25rem 0.75rem;
   border-radius: 12px;
   font-size: 0.8rem;
@@ -320,7 +321,7 @@ const withdrawTeamEarnings = async (): Promise<void> => {
 .earnings-amount {
   font-size: 1.8rem;
   font-weight: bold;
-  color: #e91e63;
+  color: rgb(192 132 252 );
   line-height: 1.2;
   margin-bottom: 0.25rem;
 }
@@ -380,12 +381,12 @@ const withdrawTeamEarnings = async (): Promise<void> => {
   }
 
   .stats-row {
-    flex-direction: column;
+    /* flex-direction: column; */
     gap: 1rem;
   }
 
   .stat-item {
-    width: 100%;
+    width: 32%;
   }
 
   .stat-value {
@@ -393,25 +394,25 @@ const withdrawTeamEarnings = async (): Promise<void> => {
   }
 
   .earnings-container {
-    flex-direction: column;
+    /* flex-direction: column; */
     align-items: flex-start;
     gap: 1rem;
   }
 
   .withdraw-btn {
-    width: 100%;
+    /* width: 100%; */
   }
 
   .member-item {
-    flex-direction: column;
+    /* flex-direction: column; */
     align-items: flex-start;
     gap: 0.5rem;
   }
 
-  .member-details {
+  /* .member-details {
     align-items: flex-start;
     flex-direction: row;
     gap: 1rem;
-  }
+  } */
 }
 </style>
