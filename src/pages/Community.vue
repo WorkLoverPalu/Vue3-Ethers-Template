@@ -11,7 +11,8 @@
             <div class="progress-bar">
               <div class="progress-fill" :style="{ width: `${userStore.level.progress}%` }"></div>
             </div>
-            <div class="progress-text">{{ t('community.nextLevelDistance') }}: {{ 100 - userStore.level.progress }}%</div>
+            <div class="progress-text">{{ t('community.nextLevelDistance') }}: {{ 100 - userStore.level.progress }}%
+            </div>
           </div>
         </div>
       </div>
@@ -31,20 +32,18 @@
       <div class="level-requirements">
         <h3 class="section-title">{{ t('community.levelRequirements') }}</h3>
         <div class="requirements-list">
-          <div 
-            v-for="level in levelRequirements" 
-            :key="level.level"
-            :class="['requirement-item', { 'current': level.level === userStore.level.current }]"
-          >
+          <div v-for="level in levelRequirements" :key="level.level"
+            :class="['requirement-item', { 'current': level.level === userStore.level.current }]">
             <div class="requirement-header">
               <div class="requirement-level">
                 Lv{{ level.level }}
-                <span v-if="level.level === userStore.level.current" class="current-badge">{{ t('community.current') }}</span>
+                <span v-if="level.level === userStore.level.current" class="current-badge">{{ t('community.current')
+                  }}</span>
               </div>
               <div class="requirement-reward">{{ level.reward }}%</div>
             </div>
-            <div class="requirement-desc">{{ level.description }}</div>
-            <div class="reward-label">{{ t('community.reward') }}</div>
+            <div class="requirement-desc">{{ level.description }} <div class="reward-label">{{ t('community.reward') }}</div></div>
+            
           </div>
         </div>
       </div>
@@ -69,7 +68,8 @@
 
 <script setup lang="ts">
 import { reactive } from 'vue'
-import { userStore, communityStore } from '@/stores/date'
+import { userStore } from '@/stores/user'
+import { communityStore } from '@/stores/community'
 import { t } from '@/utils/i18n'
 import { formatNumber } from '@/utils/helpers'
 
@@ -105,7 +105,7 @@ const levelRequirements = reactive([
 <style scoped>
 .community-page {
   min-height: 100vh;
-  padding: 0;
+  padding: 0  0 20px 0;
 }
 
 .community-content {
@@ -275,6 +275,8 @@ const levelRequirements = reactive([
   font-size: 0.9rem;
   color: rgba(255, 255, 255, 0.7);
   margin-bottom: 0.25rem;
+  display: flex;
+  justify-content: space-between;
 }
 
 .reward-label {
@@ -294,8 +296,9 @@ const levelRequirements = reactive([
 
 .stats-row {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  /* outline: solid 1px red; */
+  /* justify-content: space-between; */
+  /* align-items: center; */
 }
 
 .stat-item {
@@ -330,31 +333,31 @@ const levelRequirements = reactive([
     padding: 0.5rem;
     gap: 1rem;
   }
-  
+
   .current-level-section,
   .level-description,
   .level-requirements,
   .reward-statistics {
     padding: 1.25rem;
   }
-  
+
   .level-badge {
     font-size: 2rem;
   }
-  
+
   .requirement-item {
     padding: 1rem;
   }
-  
+
   .stats-row {
-    flex-direction: column;
+    /* flex-direction: column; */
     gap: 1rem;
   }
-  
+
   .stat-item {
-    width: 100%;
+    width: 50%;
   }
-  
+
   .stat-value {
     font-size: 1.5rem;
   }

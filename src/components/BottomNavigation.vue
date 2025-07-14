@@ -18,7 +18,7 @@ import { t } from '@/utils/i18n'
 import type { NavigationTab } from '@/types'
 
 const tabs: NavigationTab[] = [
-  { id: 'home', path: '/', icon: 'fas fa-home' },
+  { id: 'home', path: '/home', icon: 'fas fa-home' },
   { id: 'shop', path: '/shop', icon: 'fas fa-shopping-cart' },
   { id: 'wallet', path: '/wallet', icon: 'fas fa-wallet' },
   { id: 'team', path: '/team', icon: 'fas fa-users' },
@@ -61,6 +61,7 @@ const tabs: NavigationTab[] = [
 
 .nav-item i {
   font-size: 1.2rem;
+  font-style: normal;
 }
 
 /* Font Awesome Icons */

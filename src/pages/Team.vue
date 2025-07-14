@@ -25,12 +25,7 @@
         <h3 class="section-title">{{ t('team.myInvitationLink') }}</h3>
         <div class="invitation-container">
           <div class="invitation-link">
-            <input 
-              type="text" 
-              :value="teamStore.invitationLink" 
-              readonly 
-              class="link-input"
-            >
+            <input type="text" :value="teamStore.invitationLink" readonly class="link-input">
             <button class="copy-btn" @click="copyInvitationLink">
               📋
             </button>
@@ -66,12 +61,7 @@
             <div class="earnings-amount">{{ formatNumber(userStore.stats.teamEarnings) }} TIG</div>
             <div class="earnings-label">{{ t('team.availableTeamEarnings') }}</div>
           </div>
-          <AppButton 
-            variant="purple" 
-            class="withdraw-btn"
-            :loading="withdrawLoading"
-            @click="withdrawTeamEarnings"
-          >
+          <AppButton variant="purple" class="withdraw-btn" :loading="withdrawLoading" @click="withdrawTeamEarnings">
             {{ t('team.withdrawTeamEarnings') }}
           </AppButton>
         </div>
@@ -86,7 +76,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { teamStore, userStore } from '@/stores/date'
+import { teamStore } from '@/stores/team'
+import { userStore } from '@/stores/user'
 import { t, currentLang } from '@/utils/i18n'
 import { formatDate, copyToClipboard, formatNumber, sleep } from '@/utils/helpers'
 import AppButton from '@/components/AppButton.vue'
@@ -104,7 +95,7 @@ const copyInvitationLink = async (): Promise<void> => {
 
 const withdrawTeamEarnings = async (): Promise<void> => {
   withdrawLoading.value = true
-  
+
   try {
     // Simulate withdrawal process
     await sleep(2000)
@@ -380,43 +371,43 @@ const withdrawTeamEarnings = async (): Promise<void> => {
     padding: 0.5rem;
     gap: 1rem;
   }
-  
+
   .team-statistics,
   .invitation-section,
   .team-members,
   .team-earnings {
     padding: 1.25rem;
   }
-  
+
   .stats-row {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .stat-item {
     width: 100%;
   }
-  
+
   .stat-value {
     font-size: 1.5rem;
   }
-  
+
   .earnings-container {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .withdraw-btn {
     width: 100%;
   }
-  
+
   .member-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
   }
-  
+
   .member-details {
     align-items: flex-start;
     flex-direction: row;

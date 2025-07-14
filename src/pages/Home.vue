@@ -8,7 +8,7 @@
           <span class="stat-title">{{ t('dashboard.myPower') }}</span>
           <div class="stat-icon lightning">⚡</div>
         </div>
-        <div class="stat-value">{{ userStore.stats.power }} U</div>
+        <div class="stat-value">{{ userStore.stats.power }} T</div>
         <div class="stat-label">{{ t('dashboard.level') }}: A3</div>
       </div>
       
@@ -78,7 +78,7 @@
 </template>
 
 <script setup lang="ts">
-import { userStore } from '@/stores/date'
+import { userStore } from '@/stores/user'
 import { t } from '@/utils/i18n'
 import { formatNumber } from '@/utils/helpers'
 import { useRouter } from 'vue-router'
@@ -100,7 +100,7 @@ const goToTrade = (): void => {
 .home-page {
   padding: 1rem;
   max-width: 400px;
-  margin: 0 auto;
+  margin: 0 auto 20px auto;
 }
 
 /* Stats Grid */

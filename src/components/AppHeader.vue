@@ -2,7 +2,7 @@
   <header class="header">
     <div class="header-content">
       <div class="logo">
-        <img src="@/assets/img/logo.png"  class="logo-icon" alt="">
+        <img src="@/assets/img/logo.png" class="logo-icon" alt="">
         <span class="logo-text">{{ t('header.title') }}</span>
       </div>
       <div class="header-actions">
@@ -11,7 +11,7 @@
           <option value="en">English</option>
         </select>
         <button class="connect-btn" @click="handleWalletConnection">
-          {{ walletStore.isConnected ? t('header.connected') : t('header.connect') }}
+          {{ walletState.isConnected ? shortAddress(walletState.account) : t('header.connect') }}
         </button>
       </div>
     </div>
@@ -23,8 +23,9 @@ import { ref, onMounted } from 'vue'
 import { t, changeLanguage } from '@/utils/i18n'
 import { useEthers } from '@/composables/useWallet'
 import type { Language } from '@/types'
+import { shortAddress } from '@/utils/formatters'
 
-const { connectWallet, walletStore } = useEthers()
+const { connectWallet, walletState } = useEthers()
 const selectedLang = ref<Language>('zh')
 
 const handleLanguageChange = (): void => {
@@ -32,7 +33,7 @@ const handleLanguageChange = (): void => {
 }
 
 const handleWalletConnection = async (): Promise<void> => {
-  if (!walletStore.isConnected) {
+  if (!walletState.isConnected) {
     try {
       await connectWallet()
     } catch (error) {
@@ -52,7 +53,8 @@ onMounted(() => {
   padding: 1rem;
   backdrop-filter: blur(10px);
 }
-.logo-text{
+
+.logo-text {
   font-size: 18px;
   font-weight: bold;
 }

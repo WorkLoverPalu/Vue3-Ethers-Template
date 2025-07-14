@@ -35,48 +35,60 @@
         
         <AppButton 
           variant="cyan" 
-          class="purchase-btn" 
-          :loading="purchaseLoading === plan.id"
-          @click="purchasePlan(plan)"
+          class="purchase-btn"
+          @click="openPurchaseModal(plan)"
         >
           {{ t('investment.purchase') }}
         </AppButton>
       </div>
     </div>
+
+    <!-- Purchase Modal -->
+    <PurchaseModal
+      :is-visible="showPurchaseModal"
+      :selected-plan="selectedPlan"
+      :user-balance="userBalance"
+      @close="closePurchaseModal"
+      @confirm="handlePurchaseConfirm"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { investmentStore } from '@/stores/date'
+import { investmentStore } from '@/stores/investment'
 import { t } from '@/utils/i18n'
-import { formatNumber, sleep } from '@/utils/helpers'
+import { formatNumber } from '@/utils/helpers'
 import AppButton from '@/components/AppButton.vue'
+import PurchaseModal from '@/components/PurchaseModal.vue'
 import type { InvestmentPlan } from '@/types'
 import { useEthers } from '@/composables/useWallet'
 
 const { walletState } = useEthers()
-const purchaseLoading = ref<string | null>(null)
+const showPurchaseModal = ref(false)
+const selectedPlan = ref<InvestmentPlan | null>(null)
+const userBalance = ref(2450.00) // This would come from your wallet/user store
 
-const purchasePlan = async (plan: InvestmentPlan): Promise<void> => {
-  if (!walletState.isConnected) {
-    alert(t('header.connect'))
-    return
-  }
+const openPurchaseModal = (plan: InvestmentPlan): void => {
+  // if (!walletState.isConnected) {
+  //   alert(t('header.connect'))
+  //   return
+  // }
   
-  purchaseLoading.value = plan.id
-  
-  try {
-    // Simulate purchase process
-    await sleep(2000)
-    console.log('Purchasing plan:', plan)
-    alert(`Successfully purchased ${plan.name}!`)
-  } catch (error) {
-    console.error('Purchase failed:', error)
-    alert('Purchase failed!')
-  } finally {
-    purchaseLoading.value = null
-  }
+  selectedPlan.value = plan
+  showPurchaseModal.value = true
+}
+
+const closePurchaseModal = (): void => {
+  showPurchaseModal.value = false
+  selectedPlan.value = null
+}
+
+const handlePurchaseConfirm = (plan: InvestmentPlan): void => {
+  console.log('Purchase confirmed for plan:', plan)
+  // Update user balance
+  userBalance.value -= plan.usdt
+  alert(`Successfully purchased ${plan.name}!`)
 }
 </script>
 
