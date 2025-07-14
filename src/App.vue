@@ -1,20 +1,27 @@
 <template>
-  <NavBar />
-  <router-view />
+  <div>
+    <router-view />
+  </div>
 </template>
 
 <script setup lang="ts">
-import NavBar from './components/NavBar.vue'
+import router from './router'
 </script>
 
 <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  min-height: 100vh;
+}
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
+  min-height: 100vh;
 }
 </style>
