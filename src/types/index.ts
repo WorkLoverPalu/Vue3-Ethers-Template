@@ -80,11 +80,25 @@ export interface Translations {
 
 export type Language = "zh" | "en"
 
-export type ButtonVariant = "primary" | "secondary" | "success" | "purple" | "cyan"
+export type ButtonVariant = "primary" | "secondary" | "success" | "purple" | "cyan" | "danger"
 
 export interface RouteConfig {
   path: string
   name: string
   component: any
   children?: RouteConfig[]
+}
+
+export interface Order {
+  id: string
+  planName: string
+  amount: number
+  power: number
+  dailyIncome: number
+  totalEarned: number
+  status: "active" | "completed" | "cancelled"
+  createdAt: Date
+  daysCompleted: number
+  totalDays: number
+  canCancel: boolean
 }

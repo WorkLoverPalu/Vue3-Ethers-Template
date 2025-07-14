@@ -44,6 +44,7 @@ const handleWalletConnection = async (): Promise<void> => {
 
 onMounted(() => {
   // Any additional setup can be done here
+  handleWalletConnection();
 })
 </script>
 

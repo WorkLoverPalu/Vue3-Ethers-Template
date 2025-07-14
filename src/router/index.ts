@@ -5,6 +5,7 @@ import Shop from "@/pages/Shop.vue"
 import Wallet from "@/pages/Wallet.vue"
 import Team from "@/pages/Team.vue"
 import Community from "@/pages/Community.vue"
+import Orders from "@/pages/Orders.vue"
 
 const routes: RouteRecordRaw[] = [
   {
@@ -35,6 +36,11 @@ const routes: RouteRecordRaw[] = [
         path: "/community",
         name: "Community",
         component: Community,
+      },
+      {
+        path: "/orders",
+        name: "Orders",
+        component: Orders,
       },
     ],
   },

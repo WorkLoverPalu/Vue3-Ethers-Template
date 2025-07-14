@@ -11,7 +11,7 @@
         <div class="stat-value">{{ userStore.stats.power }} T</div>
         <div class="stat-label">{{ t('dashboard.level') }}: A3</div>
       </div>
-      
+
       <!-- Daily Income -->
       <div class="stat-card">
         <div class="stat-header">
@@ -21,7 +21,7 @@
         <div class="stat-value">{{ formatNumber(userStore.stats.dailyOutput) }}</div>
         <div class="stat-label">TIG</div>
       </div>
-      
+
       <!-- Total Assets -->
       <div class="stat-card">
         <div class="stat-header">
@@ -31,7 +31,7 @@
         <div class="stat-value">${{ formatNumber(userStore.stats.balance) }}</div>
         <div class="stat-label">USDT</div>
       </div>
-      
+
       <!-- Team Members -->
       <div class="stat-card">
         <div class="stat-header">
@@ -87,7 +87,7 @@ const router = useRouter()
 
 const goToOrders = (): void => {
   // Navigate to orders page or show orders modal
-  console.log('Navigate to orders')
+  router.push('/orders')
 }
 
 const goToTrade = (): void => {
@@ -252,23 +252,23 @@ const goToTrade = (): void => {
   .home-page {
     padding: 0.5rem;
   }
-  
+
   .stats-grid {
     gap: 0.75rem;
   }
-  
+
   .stat-card {
     padding: 1.25rem;
   }
-  
+
   .stat-value {
     font-size: 1.6rem;
   }
-  
+
   .operation-buttons {
     gap: 0.75rem;
   }
-  
+
   .operation-btn {
     padding: 0.875rem;
     font-size: 0.85rem;
