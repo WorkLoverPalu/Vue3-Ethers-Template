@@ -3,7 +3,7 @@
     <div class="shop-header">
       <h1 class="page-title">{{ t('investment.title') }}</h1>
     </div>
-    
+
     <div class="plans-container">
       <div v-for="plan in investmentStore.plans" :key="plan.id" class="plan-card">
         <div class="plan-header">
@@ -16,7 +16,7 @@
             <div class="power-label">{{ t('investment.power') }}</div>
           </div>
         </div>
-        
+
         <div class="plan-details">
           <div class="detail-row">
             <span class="detail-label">{{ t('investment.dailyAdaptation') }}:</span>
@@ -27,30 +27,26 @@
             <span class="detail-value green">{{ formatNumber(plan.totalOutput) }} TIG</span>
           </div>
         </div>
-        
+
         <!-- Special note for A4 plan -->
         <div v-if="plan.id === 'A4'" class="special-note">
           {{ t('investment.a4SpecialNote') }}
         </div>
-        
-        <AppButton 
-          variant="cyan" 
-          class="purchase-btn"
-          @click="openPurchaseModal(plan)"
-        >
+
+        <AppButton variant="cyan" class="purchase-btn" @click="handlePurchaseClick(plan)">
           {{ t('investment.purchase') }}
         </AppButton>
       </div>
     </div>
-
-    <!-- Purchase Modal -->
-    <PurchaseModal
-      :is-visible="showPurchaseModal"
-      :selected-plan="selectedPlan"
-      :user-balance="userBalance"
-      @close="closePurchaseModal"
-      @confirm="handlePurchaseConfirm"
+    <!-- Invite Bind Modal -->
+    <InviteBindModal
+      :is-visible="showInviteBindModal"
+      @close="closeInviteBindModal"
+      @bind-success="handleBindSuccess"
     />
+    <!-- Purchase Modal -->
+    <PurchaseModal :is-visible="showPurchaseModal" :selected-plan="selectedPlan" :user-balance="userBalance"
+      @close="closePurchaseModal" @confirm="handlePurchaseConfirm" />
   </div>
 </template>
 
@@ -65,16 +61,54 @@ import type { InvestmentPlan } from '@/types'
 import { useEthers } from '@/composables/useWallet'
 
 const { walletState } = useEthers()
+const showInviteBindModal = ref(false)
 const showPurchaseModal = ref(false)
 const selectedPlan = ref<InvestmentPlan | null>(null)
 const userBalance = ref(2450.00) // This would come from your wallet/user store
+const hasInviteAddress = ref(false)
+const inviteAddress = ref('')
+
+const handlePurchaseClick = (plan: InvestmentPlan): void => {
+  selectedPlan.value = plan
+
+  // Check if user has bound invite address
+  // if (!walletState.isConnected) {
+  //   alert(t('header.connect'))
+  //   return
+  // }
+  showPurchaseModal.value = true
+  if (!hasInviteAddress.value) {
+    showInviteBindModal.value = true
+  } else {
+    
+  }
+}
+const closeInviteBindModal = (): void => {
+  showInviteBindModal.value = false
+  selectedPlan.value = null
+}
+
+const handleBindSuccess = (address: string): void => {
+  inviteAddress.value = address
+  hasInviteAddress.value = true
+  showInviteBindModal.value = false
+  
+  // Show success message
+  alert(t('invite.bindSuccessMessage'))
+  
+  // Now show purchase modal
+  if (selectedPlan.value) {
+    showPurchaseModal.value = true
+  }
+}
+
 
 const openPurchaseModal = (plan: InvestmentPlan): void => {
   // if (!walletState.isConnected) {
   //   alert(t('header.connect'))
   //   return
   // }
-  
+
   selectedPlan.value = plan
   showPurchaseModal.value = true
 }
@@ -222,16 +256,16 @@ const handlePurchaseConfirm = (plan: InvestmentPlan): void => {
   .shop-header {
     padding: 1rem;
   }
-  
+
   .plans-container {
     padding: 0 0.5rem 2rem;
     gap: 0.75rem;
   }
-  
+
   .plan-card {
     padding: 1.25rem;
   }
-  
+
   .plan-power {
     font-size: 1.3rem;
   }
