@@ -15,4 +15,12 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  server: {
+    proxy: {
+      '/tig': {
+        target: 'http://192.168.3.197:8103',
+        changeOrigin: true,
+      }
+    }
+  }
 })

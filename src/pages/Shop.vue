@@ -3,16 +3,15 @@
     <div class="shop-header">
       <h1 class="page-title">{{ t('investment.title') }}</h1>
     </div>
-
     <div class="plans-container">
-      <div v-for="plan in investmentStore.plans" :key="plan.id" class="plan-card">
+      <div v-for="plan in shopList.value" :key="plan.Id" class="plan-card">
         <div class="plan-header">
           <div class="plan-left">
-            <h3 class="plan-name">{{ plan.name }}</h3>
-            <div class="plan-usdt">{{ plan.usdt }} USDT</div>
+            <h3 class="plan-name">{{ plan.Name }}</h3>
+            <div class="plan-usdt">{{ plan.UAmount }} USDT</div>
           </div>
           <div class="plan-right">
-            <div class="plan-power">{{ plan.amount }} U</div>
+            <div class="plan-power">{{ plan.UAmount }} T</div>
             <div class="power-label">{{ t('investment.power') }}</div>
           </div>
         </div>
@@ -20,11 +19,11 @@
         <div class="plan-details">
           <div class="detail-row">
             <span class="detail-label">{{ t('investment.dailyAdaptation') }}:</span>
-            <span class="detail-value">{{ formatNumber(plan.dailyOutput) }}</span>
+            <span class="detail-value">1/{{ plan.MaxDay }}</span>
           </div>
           <div class="detail-row">
-            <span class="detail-label">{{ t('investment.expectedDailyIncome') }}:</span>
-            <span class="detail-value green">{{ formatNumber(plan.totalOutput) }} TIG</span>
+            <span class="detail-label">{{ t('investment.收益天数') }}:</span>
+            <span class="detail-value green">{{ plan.MaxDay }} </span>
           </div>
         </div>
 
@@ -34,16 +33,14 @@
         </div>
 
         <AppButton variant="cyan" class="purchase-btn" @click="handlePurchaseClick(plan)">
-          {{ t('investment.purchase') }}
+          {{ userInfo.PAddr?t('investment.purchase'):"绑定邀请地址" }}{{ showInviteBindModal }}
         </AppButton>
       </div>
     </div>
     <!-- Invite Bind Modal -->
-    <InviteBindModal
-      :is-visible="showInviteBindModal"
-      @close="closeInviteBindModal"
-      @bind-success="handleBindSuccess"
-    />
+    
+    <InviteBindModal :is-visible="showInviteBindModal" @close="closeInviteBindModal"
+      @bind-success="handleBindSuccess" />
     <!-- Purchase Modal -->
     <PurchaseModal :is-visible="showPurchaseModal" :selected-plan="selectedPlan" :user-balance="userBalance"
       @close="closePurchaseModal" @confirm="handlePurchaseConfirm" />
@@ -51,22 +48,26 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { investmentStore } from '@/stores/investment'
+import { ref, watch, onMounted } from 'vue'
 import { t } from '@/utils/i18n'
 import { formatNumber } from '@/utils/helpers'
 import AppButton from '@/components/AppButton.vue'
 import PurchaseModal from '@/components/PurchaseModal.vue'
+import InviteBindModal from '@/components/InviteBindModal.vue'
 import type { InvestmentPlan } from '@/types'
 import { useEthers } from '@/composables/useWallet'
+import { userStore } from '@/stores/user'
 
 const { walletState } = useEthers()
+const useUserStore = userStore();
 const showInviteBindModal = ref(false)
 const showPurchaseModal = ref(false)
 const selectedPlan = ref<InvestmentPlan | null>(null)
 const userBalance = ref(2450.00) // This would come from your wallet/user store
 const hasInviteAddress = ref(false)
 const inviteAddress = ref('')
+const shopList = ref<Array<Object> | []>
+const userInfo = ref({});
 
 const handlePurchaseClick = (plan: InvestmentPlan): void => {
   selectedPlan.value = plan
@@ -76,11 +77,11 @@ const handlePurchaseClick = (plan: InvestmentPlan): void => {
   //   alert(t('header.connect'))
   //   return
   // }
-  showPurchaseModal.value = true
+  console.log(hasInviteAddress.value)
   if (!hasInviteAddress.value) {
     showInviteBindModal.value = true
   } else {
-    
+    showPurchaseModal.value = true
   }
 }
 const closeInviteBindModal = (): void => {
@@ -92,10 +93,10 @@ const handleBindSuccess = (address: string): void => {
   inviteAddress.value = address
   hasInviteAddress.value = true
   showInviteBindModal.value = false
-  
+
   // Show success message
   alert(t('invite.bindSuccessMessage'))
-  
+
   // Now show purchase modal
   if (selectedPlan.value) {
     showPurchaseModal.value = true
@@ -124,6 +125,29 @@ const handlePurchaseConfirm = (plan: InvestmentPlan): void => {
   userBalance.value -= plan.usdt
   alert(`Successfully purchased ${plan.name}!`)
 }
+
+
+const fetchData = async () => {
+  try {
+    shopList.value = await useUserStore.getShopList();
+    userInfo.value = await useUserStore.getUserInfo(walletState.value.account);
+    hasInviteAddress.value=userInfo.value.PAddr?true:false;
+  } catch (error) {
+    console.error('Failed to fetch data:', error)
+  }
+}
+watch(() => walletState.value.isConnected, (connected) => {
+  if (connected) {
+
+    fetchData()
+  }
+})
+onMounted(() => {
+  if (walletState.value.isConnected) {
+    fetchData()
+  }
+
+})
 </script>
 
 <style scoped>
@@ -249,6 +273,8 @@ const handlePurchaseConfirm = (plan: InvestmentPlan): void => {
   font-size: 1rem;
   font-weight: 600;
   border-radius: 12px;
+  background-color: #00d4ff;
+  color: #fff;
 }
 
 /* Responsive adjustments */

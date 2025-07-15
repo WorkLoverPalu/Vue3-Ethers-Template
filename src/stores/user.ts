@@ -1,28 +1,76 @@
 
-import { reactive } from "vue"
+import { reactive, ref } from "vue"
 import type {
-    UserStats,
-    UserLevel,
+  UserStats,
+  UserLevel,
 } from "@/types"
+import request from '@/utils/request'
+import { defineStore } from 'pinia'
 
-// 用户状态
-export const userStore = reactive<{
-  stats: UserStats
-  level: UserLevel
-}>({
-  stats: {
-    power: 1050,
-    dailyOutput: 35.2,
-    balance: 1275.5,
-    teamMembers: 4,
-    availableEarnings: 156.8,
-    teamEarnings: 89.2,
-    tigPrice: 0.052,
-    personalEarnings: 156.8,
-    teamEarningsTotal: 1245.6,
-  },
-  level: {
-    current: 1,
-    progress: 20,
-  },
+
+
+export const userStore = defineStore('user', () => {
+  const userInfo = ref({})
+
+
+  /**
+   * @dev 获取用户信息
+   * @param address 
+   * @returns 
+   */
+  const getUserInfo = async (address: string) => {
+    if (!address) return
+    const response = await request.post(`/UserInfo?addr=${address}`)
+    userInfo.value = response.data;
+    console.log("UserInfo response", response)
+    if (response.errCode !== 0) {
+      throw new Error('获取用户数据失败')
+    }
+    return response.data
+  }
+
+
+  /**
+   * @dev 获取共享手续费分红
+   */
+  const getAvailableFee = async () => {
+    const response = await request.post(`/AvailableFee`)
+    return response.data
+  }
+
+
+  /**
+   * @dev 获取价格
+   */
+  const getPrice = async () => {
+    return "1.001";
+  }
+
+  /**
+   * @dev 获取能源包信息
+   */
+  const getShopList = async () => {
+    const response = await request.post(`/VoteInfo`)
+    console.log("getShopList", response.data)
+    return response.data
+  }
+
+  /**
+   * @dev 绑定邀请地址
+   */
+  const bindAddress = async (address, bindAddress, sign) => {
+    console.log("参数：",address, bindAddress, sign)
+    const response = await request.post(`/BindAddress?address=${address}&bindAddress=${bindAddress}&sign=${sign}`)
+    console.log("bindAddress", response.data)
+    return response
+  }
+
+  return {
+    getUserInfo,
+    getAvailableFee,
+    getPrice,
+    getShopList,
+    userInfo,
+    bindAddress
+  }
 })

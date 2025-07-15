@@ -1,7 +1,7 @@
 import { ethers } from 'ethers'
 import { formatUnits, parseUnits } from 'ethers/lib/utils'
 
-import { CONTRACT_ADDRESS, NOS_ADDRESS, ERC20_ABI,CONTRACT_ABI } from '@/contracts'
+import { CONTRACT_ADDRESS, NOS_ADDRESS, ERC20_ABI, CONTRACT_ABI } from '@/contracts'
 import { formatNumber, safeContractCall } from './formatters'
 import { SysInfo, NodeData, NodeInfo, UserInfo, Redemption } from '@/types/staking'
 
@@ -13,13 +13,13 @@ import AES from './AES.js';
 export class StakingContractService {
     private StakingContract: ethers.Contract
     private ERC20Contract: ethers.Contract
-    private MutilNOSContract: ethers.Contract
     private provider: ethers.providers.Web3Provider | null = null
+    private signer: ethers.Signer | null = null
 
     constructor(signerOrProvider: ethers.Signer | ethers.providers.Provider) {
         this.StakingContract = new ethers.Contract(
             CONTRACT_ADDRESS,
-            NOS_POS_STAKING_ABI,
+            CONTRACT_ABI,
             signerOrProvider
         )
         this.ERC20Contract = new ethers.Contract(
@@ -27,13 +27,12 @@ export class StakingContractService {
             ERC20_ABI,
             signerOrProvider
         )
-        this.MutilNOSContract = new ethers.Contract(
-            MutilNOS_ADDRESS,
-            MutilNOS_ABI,
-            signerOrProvider
-        )
+       
         if (signerOrProvider instanceof ethers.providers.Web3Provider) {
             this.provider = signerOrProvider
+            this.signer = this.provider.getSigner()
+        } else if (signerOrProvider instanceof ethers.Signer) {
+            this.signer = signerOrProvider
         }
     }
 
@@ -301,10 +300,37 @@ export class StakingContractService {
         return tx
     }
 
-    async decodeAes(content, account) {
-        var sign = AES.decodeAes(content, account)
+   
+    async decodeAes(content: string, account: string) {
+        const sign = AES.decodeAes(content, account)
         return sign
     }
+
+    /**
+     * 以太坊签名（带前缀）
+     * @param param 要签名的参数
+     */
+    async EthSign(param: string): Promise<string> {
+        if (!this.signer) throw new Error('Signer not initialized')
+
+        const message = 'bindAddr:' + param
+        const signature = await this.signer.signMessage(message)
+        console.log("签名结果", signature)
+        return signature
+    }
+
+    /**
+     * 以太坊签名（原始信息）
+     * @param param 要签名的原始信息
+     */
+    async EthSignInfo(param: string): Promise<string> {
+        if (!this.signer) throw new Error('Signer not initialized')
+
+        const signature = await this.signer.signMessage(param)
+        console.log("签名结果", signature)
+        return signature
+    }
+
 
     //获取已经领取的收益
     async getClaimedAmount(account) {

@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const service = axios.create({
-  baseURL: '',
+  baseURL: '/tig',
   timeout: 10000
 })
 

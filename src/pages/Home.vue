@@ -3,33 +3,34 @@
     <!-- Stats Grid - 2x2 layout -->
     <div class="stats-grid">
       <!-- My Power -->
+      <!-- {{ userInfo }} -->
       <div class="stat-card">
         <div class="stat-header">
-          <span class="stat-title">{{ t('dashboard.myPower') }}</span>
+          <span class="stat-title">{{ t('dashboard.个人业绩') }}</span>
           <div class="stat-icon lightning">⚡</div>
         </div>
-        <div class="stat-value">{{ userStore.stats.power }} T</div>
-        <div class="stat-label">{{ t('dashboard.level') }}: A3</div>
+        <div class="stat-value">{{ userInfo.Ua.Performance }} T</div>
+        <div class="stat-label">{{ t('dashboard.level') }}: A{{ userInfo.Ua.LevelPerformance }}</div>
       </div>
 
       <!-- Daily Income -->
       <div class="stat-card">
         <div class="stat-header">
-          <span class="stat-title">{{ t('dashboard.dailyIncome') }}</span>
+          <span class="stat-title">{{ t('dashboard.团队业绩') }}</span>
           <div class="stat-icon trending">📈</div>
         </div>
-        <div class="stat-value">{{ formatNumber(userStore.stats.dailyOutput) }}</div>
-        <div class="stat-label">TIG</div>
+        <div class="stat-value">{{ formatNumber(userInfo.Ua.TeamPerformance) }} T</div>
+        <div class="stat-label"></div>
       </div>
 
       <!-- Total Assets -->
       <div class="stat-card">
         <div class="stat-header">
-          <span class="stat-title">{{ t('dashboard.totalAssets') }}</span>
+          <span class="stat-title">{{ t('dashboard.累计收益') }}</span>
           <div class="stat-icon wallet">💳</div>
         </div>
-        <div class="stat-value">${{ formatNumber(userStore.stats.balance) }}</div>
-        <div class="stat-label">USDT</div>
+        <div class="stat-value">{{ formatNumber(userInfo.Ua.TotalProfit || 0) }}</div>
+        <div class="stat-label">TIG</div>
       </div>
 
       <!-- Team Members -->
@@ -38,7 +39,7 @@
           <span class="stat-title">{{ t('dashboard.teamMembers') }}</span>
           <div class="stat-icon people">👥</div>
         </div>
-        <div class="stat-value">{{ userStore.stats.teamMembers }}</div>
+        <div class="stat-value">{{ userInfo.Ua.People }}</div>
         <div class="stat-label">{{ t('dashboard.people') }}</div>
       </div>
     </div>
@@ -58,19 +59,16 @@
 
     <!-- Earnings Overview -->
     <div class="earnings-overview">
-      <h3 class="section-title">{{ t('dashboard.earningsOverview') }}</h3>
+      <h3 class="section-title">{{ t('dashboard.概览') }}</h3>
       <div class="earnings-list">
         <div class="earning-item">
-          <span class="earning-label">{{ t('dashboard.availableEarnings') }}</span>
-          <span class="earning-value green">{{ formatNumber(userStore.stats.availableEarnings) }} TIG</span>
+          <span class="earning-label">{{ t('dashboard.共享手续费分红') }}</span>
+          <span class="earning-value green">{{ formatNumber(availableFee || 0) }} TIG</span>
         </div>
-        <div class="earning-item">
-          <span class="earning-label">{{ t('dashboard.availableTeamRewards') }}</span>
-          <span class="earning-value purple">{{ formatNumber(userStore.stats.teamEarnings) }} TIG</span>
-        </div>
+
         <div class="earning-item">
           <span class="earning-label">{{ t('dashboard.tigPrice') }}</span>
-          <span class="earning-value cyan">${{ formatNumber(userStore.stats.tigPrice, 3) }} (+2.3%)</span>
+          <span class="earning-value cyan">${{ formatNumber(price || 0) }}</span>
         </div>
       </div>
     </div>
@@ -78,12 +76,19 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, watch } from "vue";
 import { userStore } from '@/stores/user'
 import { t } from '@/utils/i18n'
-import { formatNumber } from '@/utils/helpers'
+import { formatNumber, shortAddress } from '@/utils/formatters'
 import { useRouter } from 'vue-router'
+import { useEthers } from '@/composables/useWallet'
 
 const router = useRouter()
+const { walletState } = useEthers()
+const useUserStore = userStore();
+const error = ref<string | null>(null)
+const availableFee = ref<string | 0>(0)
+const price = ref<string | 0>(0)
 
 const goToOrders = (): void => {
   // Navigate to orders page or show orders modal
@@ -92,8 +97,54 @@ const goToOrders = (): void => {
 
 const goToTrade = (): void => {
   // Navigate to trade page
-  router.push('/shop')
+  window.open('https://kswap.web3s.finance/#/swap?inputCurrency=0x72aBAf0F89a7E7a74b56e188a6dCE718b4Cf4d94&outputCurrency=0x56B75F7576a9a9E14AF883126D2b6d5997b78A0f', '_blank');
 }
+
+const userInfo = ref({
+  "Ua": {
+    "Addr": "",
+    "IdFlag": 0,
+    "Pid": 0,
+    "PidFlag": "",
+    "People": 0,
+    "UseProfit": 0,
+    "TotalProfit": 0,
+    "TeamPerformance": 0,
+    "Performance": 0,
+    "LevelPerformance": 0,
+    "Level": 0,
+    "CreateTime": ""
+  },
+  "PAddr": ""
+})
+
+const fetchData = async () => {
+  console.log("用户地址", walletState.value.account)
+  if (!walletState.value.account) return
+  try {
+    error.value = null
+    userInfo.value = await useUserStore.getUserInfo(walletState.value.account);
+
+    availableFee.value = await useUserStore.getAvailableFee();
+    price.value = await useUserStore.getPrice();
+  } catch (err) {
+    console.error('Failed to fetch data:', err)
+    error.value = err instanceof Error ? err.message : '获取数据失败'
+  }
+}
+
+watch(() => walletState.value.isConnected, (connected) => {
+  if (connected) {
+
+    fetchData()
+  }
+})
+onMounted(() => {
+  if (walletState.value.isConnected) {
+    fetchData()
+  }
+
+})
 </script>
 
 <style scoped>
