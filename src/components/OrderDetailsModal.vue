@@ -111,7 +111,11 @@ import { t } from '@/utils/i18n'
 import { formatDate, formatNumber } from '@/utils/helpers'
 import AppButton from '@/components/AppButton.vue'
 import type { Order } from '@/types'
+import {onMounted} from "vue"
+import request from '@/utils/request'
+import { useEthers } from '@/composables/useWallet'
 
+const { walletState, Instance } = useEthers()
 interface Props {
   isVisible: boolean
   order: Order | null
@@ -133,6 +137,18 @@ const handleCancelOrder = (): void => {
   // Emit cancel order event to parent
   emit('close')
 }
+const fetchData=async()=>{
+  try {
+  
+  } catch (error) {
+    console.error('Failed to fetch data:', error)
+  }
+}
+onMounted(() => {
+  if (walletState.value.isConnected) {
+    fetchData()
+  }
+})
 </script>
 
 <style scoped>

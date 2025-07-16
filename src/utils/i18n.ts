@@ -23,6 +23,7 @@ export const translations: Translations = {
       累计收益: "累计收益",
       共享手续费分红:"共享手续费分红",
       概览:"概览",
+      
 
 
       dailyOutput: "每日产出",
@@ -77,6 +78,9 @@ export const translations: Translations = {
       bindSuccessMessage: "邀请地址绑定成功！",
     },
     purchase: {
+      最大天数:"最大天数",
+
+      
       confirmPurchase: "确认购买",
       planDetails: "计划详情",
       paymentInfo: "支付信息",

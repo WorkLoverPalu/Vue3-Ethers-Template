@@ -17,7 +17,7 @@
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">{{ t('purchase.最大天数') }}:</span>
-                        <span class="detail-value">{{ selectedPlan?.MaxDay}}</span>
+                        <span class="detail-value">{{ selectedPlan?.MaxDay }}</span>
                     </div>
                 </div>
 
@@ -26,15 +26,15 @@
                     <h3 class="section-title green">{{ t('purchase.paymentInfo') }}</h3>
                     <div class="detail-item">
                         <span class="detail-label">{{ t('purchase.needToPay') }}:</span>
-                        <span class="detail-value">{{ selectedPlan?.UAmount }} NOS</span>
+                        <span class="detail-value">{{ selectedPlan?.needAmount }} NOS</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">{{ t('purchase.myNOS') }}:</span>
-                        <span class="detail-value">{{ formatNumber(userBalance) }}</span>
+                        <span class="detail-value">{{ formatNumber(selectedPlan?.userBalance) }}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">{{ t('purchase.nosPrice') }}:</span>
-                        <span class="detail-value">$1.00</span>
+                        <span class="detail-value">${{ formatNumber(selectedPlan?.price) }}</span>
                     </div>
                 </div>
             </div>
@@ -43,7 +43,8 @@
             <div class="balance-section">
                 <div class="balance-item">
                     <span class="balance-label">{{ t('purchase.balanceAfterPayment') }}:</span>
-                    <span class="balance-value">{{ formatNumber(balanceAfterPayment) }} NOS</span>
+                    <span class="balance-value">{{ formatNumber(selectedPlan?.userBalance - selectedPlan?.needAmount
+                        < 0 ? 0 : selectedPlan?.userBalance - selectedPlan?.needAmount) }} NOS</span>
                 </div>
             </div>
 
@@ -52,10 +53,14 @@
                 <AppButton variant="secondary" class="cancel-btn" @click="handleCancel">
                     {{ t('purchase.cancel') }}
                 </AppButton>
-                <AppButton variant="secondary" class="confirm-btn" :loading="isProcessing" :disabled="!canPurchase"
+                <AppButton variant="secondary" class="confirm-btn" :disabled="!canPurchase" :loading="isProcessing"
                     @click="handleConfirm">
-                    {{ t('purchase.confirmPurchase') }}
+                    {{ selectedPlan.nosAllowance * 1 >= selectedPlan.needAmount * 1 ? t('purchase.confirmPurchase') :
+                        t('purchase.授权')
+                    }}
                 </AppButton>
+
+
             </div>
         </div>
     </div>
@@ -64,21 +69,22 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { t } from '@/utils/i18n'
-import { formatNumber, sleep } from '@/utils/helpers'
+import { formatNumber, sleep } from '@/utils/formatters'
 import AppButton from '@/components/AppButton.vue'
-import type { InvestmentPlan } from '@/types'
 import { useEthers } from '@/composables/useWallet'
+import request from '@/utils/request'
 
-const { walletState } = useEthers()
+const { walletState, Instance } = useEthers()
 interface Props {
     isVisible: boolean
-    selectedPlan: InvestmentPlan | null
+    selectedPlan: any | null
     userBalance?: number
 }
 
 interface Emits {
     (e: 'close'): void
-    (e: 'confirm', plan: InvestmentPlan): void
+    (e: 'approve'): void
+    (e: 'confirm', plan: any): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -91,12 +97,12 @@ const isProcessing = ref(false)
 
 const balanceAfterPayment = computed(() => {
     if (!props.selectedPlan) return props.userBalance
-    return props.userBalance - props.selectedPlan.usdt
+    return props.selectedPlan - props.selectedPlan.usdt
 })
 
 const canPurchase = computed(() => {
     if (!props.selectedPlan) return false
-    return props.userBalance >= props.selectedPlan.usdt
+    return props.selectedPlan.userBalance * 1 >= props.selectedPlan.needAmount * 1
 })
 
 const handleOverlayClick = (): void => {
@@ -117,13 +123,37 @@ const handleConfirm = async (): Promise<void> => {
     isProcessing.value = true
 
     try {
-        // Simulate purchase process
-        await sleep(2000)
-        emit('confirm', props.selectedPlan)
-        emit('close')
+
+        if (props.selectedPlan.nosAllowance >= props.selectedPlan.needAmount) {
+            let buyApiRes = await request.post(`/Pledge?id=${props.selectedPlan.Id}&addr=${walletState.value.account}`);
+            console.log("res", buyApiRes)
+            let desInfo = await Instance.value?.decodeAes(buyApiRes.data, walletState.value.account);
+            console.log("desInfo", desInfo)
+            var s = desInfo.split("-");
+            console.log("s", s);
+            // 注意质押参数
+            const tx = await Instance.value.buy(
+                s[3], s[1], s[2], s[4], s[0],
+            )
+            await tx.wait()
+
+            emit('confirm', props.selectedPlan)
+            emit('close')
+        } else {
+            const tx = await Instance.value.approve();
+            await tx.wait()
+            return emit('approve')
+        }
+
     } catch (error) {
         console.error('Purchase failed:', error)
-        alert('Purchase failed!')
+
+        if (!error.message || !error.message.includes('BigNumber')) {
+            alert(error.message || '交易失败')
+        } else {
+            isProcessing.value = true
+            emit('confirm', props.selectedPlan)
+        }
     } finally {
         isProcessing.value = false
     }
@@ -170,6 +200,7 @@ const handleConfirm = async (): Promise<void> => {
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
     margin-bottom: 2rem;
+    justify-content: space-between;
 }
 
 .details-section {

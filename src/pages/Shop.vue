@@ -34,7 +34,7 @@
         </div>
 
         <AppButton variant="cyan" class="purchase-btn" @click="handlePurchaseClick(plan)">
-          {{ userInfo.PAddr ? t('investment.purchase') : "绑定邀请地址" }}
+          {{ apiUserInfo.PAddr ? t('investment.purchase') : "绑定邀请地址" }}
         </AppButton>
       </div>
     </div>
@@ -43,45 +43,53 @@
     <InviteBindModal :is-visible="showInviteBindModal" @close="closeInviteBindModal"
       @bind-success="handleBindSuccess" />
     <!-- Purchase Modal -->
-    <PurchaseModal :is-visible="showPurchaseModal" :selected-plan="selectedPlan" :user-balance="userBalance"
-      @close="closePurchaseModal" @confirm="handlePurchaseConfirm" />
+    <PurchaseModal :is-visible="showPurchaseModal" :selected-plan="selectedPlan"
+      :user-balance="chainUserInfo.nosBalance || 0" @close="closePurchaseModal" @confirm="handlePurchaseConfirm"
+      @approve="selectedPlan.nosAllowance = selectedPlan.needAmount" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { t } from '@/utils/i18n'
-import { formatNumber } from '@/utils/helpers'
 import AppButton from '@/components/AppButton.vue'
 import PurchaseModal from '@/components/PurchaseModal.vue'
 import InviteBindModal from '@/components/InviteBindModal.vue'
-import type { InvestmentPlan } from '@/types'
 import { useEthers } from '@/composables/useWallet'
 import { userStore } from '@/stores/user'
+import request from '@/utils/request'
 
-const { walletState } = useEthers()
+const { walletState, Instance } = useEthers()
 const useUserStore = userStore();
 const showInviteBindModal = ref(false)
 const showPurchaseModal = ref(false)
-const selectedPlan = ref<InvestmentPlan | null>(null)
-const userBalance = ref(2450.00) // This would come from your wallet/user store
+const selectedPlan = ref<any | null>(null)
 const hasInviteAddress = ref(false)
 const inviteAddress = ref('')
 const shopList = ref<Array<Object> | []>
-const userInfo = ref({});
+const apiUserInfo = ref(Object);
+const chainUserInfo = ref({
+  nosBalance: 0,
+  nosAllowance: 0,
+  tigBalance: 0,
+  tigAllowance: 0,
+})
+const price = ref<string | 0>(0)
 
 const handlePurchaseClick = async (plan): Promise<void> => {
-  selectedPlan.value = plan;
-
-  // Check if user has bound invite address
-  // if (!walletState.isConnected) {
-  //   alert(t('header.connect'))
-  //   return
-  // }
   console.log(hasInviteAddress.value)
   if (!hasInviteAddress.value) {
     showInviteBindModal.value = true
   } else {
+    const res = await request.post(`/GetPledgeNos?id=${plan.Id}`);
+    console.log("res", res)
+    selectedPlan.value = {
+      ...plan,
+      needAmount: res.data,
+      userBalance: chainUserInfo.value.nosBalance,
+      price: price.value,
+      nosAllowance: chainUserInfo.value.nosAllowance
+    };
     showPurchaseModal.value = true
   }
 }
@@ -104,37 +112,27 @@ const handleBindSuccess = (address: string): void => {
   }
 }
 
-
-const openPurchaseModal = (plan: InvestmentPlan): void => {
-  // if (!walletState.isConnected) {
-  //   alert(t('header.connect'))
-  //   return
-  // }
-
-  selectedPlan.value = plan
-  showPurchaseModal.value = true
-}
-
 const closePurchaseModal = (): void => {
   showPurchaseModal.value = false
   selectedPlan.value = null
 }
 
-const handlePurchaseConfirm = (plan: InvestmentPlan): void => {
-  console.log('Purchase confirmed for plan:', plan)
-  // Update user balance
-  userBalance.value -= plan.usdt
-  alert(`Successfully purchased ${plan.name}!`)
+const handlePurchaseConfirm = (plan: any): void => {
+  console.log('Purchase confirmed for plan',)
+  alert(`Successfully purchased !`)
 }
 
 
 const fetchData = async () => {
   try {
     shopList.value = await useUserStore.getShopList();
-    userInfo.value = await useUserStore.getUserInfo(walletState.value.account);
-    hasInviteAddress.value = userInfo.value.PAddr ? true : false;
-
-    console.log('shopList.value', shopList.value)
+    apiUserInfo.value = await useUserStore.getUserInfo(walletState.value.account);
+    hasInviteAddress.value = apiUserInfo.value.PAddr ? true : false;
+    chainUserInfo.value = await Instance.value.getAssetAndApprovalInfo(walletState.value.account);
+    // let chainPrice = await Instance.value.getTokenPrice();
+    let apiPrice = await useUserStore.getPrice();
+    price.value = apiPrice.toString();
+    console.log('shopList.value', shopList.value, chainUserInfo.value)
   } catch (error) {
     console.error('Failed to fetch data:', error)
   }

@@ -15,14 +15,6 @@ export interface UserLevel {
   progress: number
 }
 
-export interface InvestmentPlan {
-  id: string
-  name: string
-  amount: number
-  usdt: number
-  dailyOutput: number
-  totalOutput: number
-}
 
 export interface EarningsRecord {
   id: number
@@ -101,4 +93,5 @@ export interface Order {
   daysCompleted: number
   totalDays: number
   canCancel: boolean
+  needAmount:number
 }

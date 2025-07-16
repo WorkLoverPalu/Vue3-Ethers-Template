@@ -69,3 +69,7 @@ export function shortAddress(address: string): string {
     const addr = address
     return `${addr.substring(0, 3)}...${addr.substring(addr.length - 4)}`
 }
+
+export const sleep = (ms: number): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}

@@ -77,15 +77,15 @@ export class StakingContractService {
 
     async buy(
         _id: string,
-        _uAmount: string,
         _nosAmount: string,
+        _uAmount: string,
         _time: string,
         _sign: string,
     ): Promise<ethers.ContractTransaction> {
         const tx = await this.StakingContract.buy(
             _id,
-            _uAmount,
             _nosAmount,
+            _uAmount,
             _time,
             _sign
         )
@@ -107,4 +107,48 @@ export class StakingContractService {
         )
         return tx
     }
+    async approve(
+    ): Promise<ethers.ContractTransaction> {
+        let amount = 1000000;
+        const tx = await this.ERC20Contract.approve(
+            CONTRACT_ADDRESS,
+            parseUnits(amount.toString(), 18)
+        )
+        return tx
+    }
+
+
+
+
+
+    async decodeAes(content: string, account: string) {
+        const sign = AES.decodeAes(content, account)
+        return sign
+    }
+
+    /**
+     * 以太坊签名（带前缀）
+     * @param param 要签名的参数
+     */
+    async EthSign(param: string): Promise<string> {
+        if (!this.signer) throw new Error('Signer not initialized')
+
+        const message = 'bindAddr:' + param
+        const signature = await this.signer.signMessage(message)
+        console.log("签名结果", signature)
+        return signature
+    }
+
+    /**
+     * 以太坊签名（原始信息）
+     * @param param 要签名的原始信息
+     */
+    async EthSignInfo(param: string): Promise<string> {
+        if (!this.signer) throw new Error('Signer not initialized')
+
+        const signature = await this.signer.signMessage(param)
+        console.log("签名结果", signature)
+        return signature
+    }
+
 }
