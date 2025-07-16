@@ -58,7 +58,7 @@
         <h3 class="section-title">{{ t('team.teamEarnings') }}</h3>
         <div class="earnings-container">
           <div class="earnings-info">
-            <div class="earnings-amount">{{ formatNumber(userStore.stats.teamEarnings) }} TIG</div>
+            <div class="earnings-amount">{{ formatNumber(0) }} TIG</div>
             <div class="earnings-label">{{ t('team.availableTeamEarnings') }}</div>
           </div>
           <AppButton variant="purple" class="withdraw-btn" :loading="withdrawLoading" @click="withdrawTeamEarnings">

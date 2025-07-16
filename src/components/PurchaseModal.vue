@@ -9,15 +9,15 @@
                     <h3 class="section-title cyan">{{ t('purchase.planDetails') }}</h3>
                     <div class="detail-item">
                         <span class="detail-label">{{ t('purchase.plan') }}:</span>
-                        <span class="detail-value">{{ selectedPlan?.name }}</span>
+                        <span class="detail-value">{{ selectedPlan?.Name }}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">{{ t('purchase.power') }}:</span>
-                        <span class="detail-value">{{ selectedPlan?.amount }} U</span>
+                        <span class="detail-value">{{ selectedPlan?.Pow }} T</span>
                     </div>
                     <div class="detail-item">
-                        <span class="detail-label">{{ t('purchase.expectedDailyIncome') }}:</span>
-                        <span class="detail-value">{{ formatNumber(selectedPlan?.totalOutput || 0) }} TIG</span>
+                        <span class="detail-label">{{ t('purchase.最大天数') }}:</span>
+                        <span class="detail-value">{{ selectedPlan?.MaxDay}}</span>
                     </div>
                 </div>
 
@@ -26,7 +26,7 @@
                     <h3 class="section-title green">{{ t('purchase.paymentInfo') }}</h3>
                     <div class="detail-item">
                         <span class="detail-label">{{ t('purchase.needToPay') }}:</span>
-                        <span class="detail-value">{{ selectedPlan?.usdt }} NOS</span>
+                        <span class="detail-value">{{ selectedPlan?.UAmount }} NOS</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">{{ t('purchase.myNOS') }}:</span>
@@ -52,7 +52,7 @@
                 <AppButton variant="secondary" class="cancel-btn" @click="handleCancel">
                     {{ t('purchase.cancel') }}
                 </AppButton>
-                <AppButton variant="cyan" class="confirm-btn" :loading="isProcessing" :disabled="!canPurchase"
+                <AppButton variant="secondary" class="confirm-btn" :loading="isProcessing" :disabled="!canPurchase"
                     @click="handleConfirm">
                     {{ t('purchase.confirmPurchase') }}
                 </AppButton>
@@ -67,7 +67,9 @@ import { t } from '@/utils/i18n'
 import { formatNumber, sleep } from '@/utils/helpers'
 import AppButton from '@/components/AppButton.vue'
 import type { InvestmentPlan } from '@/types'
+import { useEthers } from '@/composables/useWallet'
 
+const { walletState } = useEthers()
 interface Props {
     isVisible: boolean
     selectedPlan: InvestmentPlan | null

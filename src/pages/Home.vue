@@ -70,6 +70,14 @@
           <span class="earning-label">{{ t('dashboard.tigPrice') }}</span>
           <span class="earning-value cyan">${{ formatNumber(price || 0) }}</span>
         </div>
+        <div class="earning-item">
+          <span class="earning-label">{{ t('dashboard.我的TIG资产') }}</span>
+          <span class="earning-value cyan">${{ formatNumber(chainInfo.tigBalance || 0) }}</span>
+        </div>
+        <div class="earning-item">
+          <span class="earning-label">{{ t('dashboard.我的NOS资产') }}</span>
+          <span class="earning-value cyan">${{ formatNumber(chainInfo.nosBalance || 0) }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -84,11 +92,17 @@ import { useRouter } from 'vue-router'
 import { useEthers } from '@/composables/useWallet'
 
 const router = useRouter()
-const { walletState } = useEthers()
+const { walletState, Instance } = useEthers()
 const useUserStore = userStore();
 const error = ref<string | null>(null)
 const availableFee = ref<string | 0>(0)
 const price = ref<string | 0>(0)
+const chainInfo = ref({
+  nosBalance: 0,
+  nosAllowance: 0,
+  tigBalance: 0,
+  tigAllowance: 0,
+})
 
 const goToOrders = (): void => {
   // Navigate to orders page or show orders modal
@@ -126,7 +140,12 @@ const fetchData = async () => {
     userInfo.value = await useUserStore.getUserInfo(walletState.value.account);
 
     availableFee.value = await useUserStore.getAvailableFee();
-    price.value = await useUserStore.getPrice();
+    let chainPrice = await Instance.value.getTokenPrice();
+    let apiPrice = await useUserStore.getPrice();
+    console.log("==", chainPrice, apiPrice)
+    price.value = (apiPrice / chainPrice.price * 1).toString();
+
+    chainInfo.value = await Instance.value.getAssetAndApprovalInfo(walletState.value.account);
   } catch (err) {
     console.error('Failed to fetch data:', err)
     error.value = err instanceof Error ? err.message : '获取数据失败'

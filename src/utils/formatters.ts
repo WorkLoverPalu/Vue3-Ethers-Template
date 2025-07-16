@@ -6,10 +6,10 @@ import { ethers } from 'ethers'
  * @param decimals 保留小数位数
  * @returns 格式化后的字符串
  */
-export function formatNumber(num: string, decimals: number = 2): string {
-    return num;
+export function formatNumber(num: string, decimals: number = 4): string {
+    // return num;
     if (!num) return '0'
-
+    num=num.toString();
     // 如果是科学计数法表示的数字
     if (num.includes('e')) {
         num = ethers.utils.formatUnits(num, 0)

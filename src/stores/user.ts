@@ -11,6 +11,7 @@ import { defineStore } from 'pinia'
 
 export const userStore = defineStore('user', () => {
   const userInfo = ref({})
+  const shopInfo = ref([])
 
 
   /**
@@ -43,7 +44,8 @@ export const userStore = defineStore('user', () => {
    * @dev 获取价格
    */
   const getPrice = async () => {
-    return "1.001";
+    const response = await request.post(`/GetPledgePrice`)
+    return response.data
   }
 
   /**
@@ -52,6 +54,7 @@ export const userStore = defineStore('user', () => {
   const getShopList = async () => {
     const response = await request.post(`/VoteInfo`)
     console.log("getShopList", response.data)
+    shopInfo.value=response.data
     return response.data
   }
 
@@ -65,12 +68,17 @@ export const userStore = defineStore('user', () => {
     return response
   }
 
+  /**
+   * @dev 获取
+   */
+
   return {
     getUserInfo,
     getAvailableFee,
     getPrice,
     getShopList,
     userInfo,
-    bindAddress
+    bindAddress,
+    shopInfo
   }
 })

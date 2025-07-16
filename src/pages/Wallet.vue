@@ -13,8 +13,6 @@
             <span>{{ t('wallet.personalEarnings') }}</span>
           </div>
           <div class="last-withdrawal">
-            <span>{{ t('wallet.lastWithdrawal') }}</span>
-            <span class="withdrawal-date">2024-01-15</span>
           </div>
         </div>
 
@@ -24,7 +22,7 @@
               <span class="card-icon">🕐</span>
               <span class="card-title">{{ t('wallet.currentEarnings') }}</span>
             </div>
-            <div class="earning-amount green">{{ formatNumber(userStore.stats.availableEarnings) }}</div>
+            <div class="earning-amount green">{{ formatNumber(userInfo.Ua.UseProfit) }}</div>
             <div class="earning-unit">TIG</div>
           </div>
 
@@ -33,15 +31,12 @@
               <span class="card-icon">✅</span>
               <span class="card-title">{{ t('wallet.historicalEarnings') }}</span>
             </div>
-            <div class="earning-amount blue">{{ formatNumber(userStore.stats.personalEarnings * 8) }}</div>
+            <div class="earning-amount blue">{{ formatNumber(userInfo.Ua.TotalProfit) }}</div>
             <div class="earning-unit">TIG</div>
           </div>
         </div>
 
-        <AppButton variant="success" class="withdraw-btn" :loading="withdrawLoading === 'personal'"
-          @click="withdrawEarnings('personal')">
-          {{ t('wallet.withdraw') }} {{ formatNumber(userStore.stats.availableEarnings) }} TIG
-        </AppButton>
+
       </div>
 
       <!-- Team Earnings Section -->
@@ -51,10 +46,10 @@
             <span class="section-icon">👥</span>
             <span>{{ t('wallet.teamEarnings') }}</span>
           </div>
-          <div class="last-withdrawal">
+          <!-- <div class="last-withdrawal">
             <span>{{ t('wallet.lastWithdrawal') }}</span>
             <span class="withdrawal-date">2024-01-12</span>
-          </div>
+          </div> -->
         </div>
 
         <div class="earnings-cards">
@@ -63,7 +58,7 @@
               <span class="card-icon">🕐</span>
               <span class="card-title">{{ t('wallet.currentEarnings') }}</span>
             </div>
-            <div class="earning-amount purple">{{ formatNumber(userStore.stats.teamEarnings) }}</div>
+            <div class="earning-amount purple">{{ formatNumber(userInfo.Ua.TeamProfit || 0) }}</div>
             <div class="earning-unit">TIG</div>
           </div>
 
@@ -72,16 +67,18 @@
               <span class="card-icon">✅</span>
               <span class="card-title">{{ t('wallet.historicalEarnings') }}</span>
             </div>
-            <div class="earning-amount blue">{{ formatNumber(567.3) }}</div>
+            <div class="earning-amount blue">{{ formatNumber(userInfo.Ua.TeamPerformance) }}</div>
             <div class="earning-unit">TIG</div>
           </div>
         </div>
 
-        <AppButton variant="purple" class="withdraw-btn" :loading="withdrawLoading === 'team'"
-          @click="withdrawEarnings('team')">
-          {{ t('wallet.withdraw') }} {{ formatNumber(userStore.stats.teamEarnings) }} TIG
-        </AppButton>
+
       </div>
+
+      <AppButton variant="purple" class="withdraw-btn" :loading="withdrawLoading === 'team'"
+        @click="withdrawEarnings('team')">
+        {{ t('wallet.withdraw') }} {{ formatNumber(userInfo.Ua.TeamPerformance) }} TIG
+      </AppButton>
 
       <!-- Withdrawal Instructions -->
       <div class="withdrawal-instructions">
@@ -96,7 +93,7 @@
       </div>
 
       <!-- Recent Withdrawal Records -->
-      <div class="withdrawal-records">
+      <!-- <div class="withdrawal-records">
         <h3 class="records-title">{{ t('wallet.recentWithdrawals') }}</h3>
         <div class="records-list">
           <div v-for="record in withdrawalRecords" :key="record.id" class="record-item">
@@ -105,7 +102,77 @@
               <div class="record-date">{{ formatDate(record.date) }}</div>
             </div>
             <div class="record-amount">+{{ formatNumber(record.amount) }} TIG</div>
-            <!-- <div class="record-status">{{ t('wallet.completed') }}</div> -->
+          </div>
+        </div>
+      </div> -->
+      <!-- 修改记录部分为 Tab 标签页 -->
+      <div class="withdrawal-records">
+        <div class="records-header">
+          <h3 class="records-title">{{ t('wallet.recentWithdrawals') }}</h3>
+          <div class="records-tabs">
+            <button class="tab-button" :class="{ active: activeTab === 'withdrawals' }"
+              @click="activeTab = 'withdrawals'">
+              {{ t('wallet.收益记录') }}
+            </button>
+            <button class="tab-button" :class="{ active: activeTab === 'earnings' }" @click="activeTab = 'earnings'">
+              {{ t('wallet.提取记录') }}
+            </button>
+          </div>
+        </div>
+
+        <!-- 提取记录 -->
+        <div v-if="activeTab === 'withdrawals'">
+          <div class="records-list">
+            <div v-for="record in paginatedWithdrawals" :key="record.id" class="record-item">
+              <div class="record-info">
+                <div class="record-type">{{ record.type }}</div>
+                <div class="record-date">{{ formatDate(record.date) }}</div>
+              </div>
+              <div class="record-amount">+{{ formatNumber(record.amount) }} TIG</div>
+            </div>
+            <div v-if="withdrawalRecords.length === 0" class="no-records">
+              {{ t('wallet.noRecords') }}
+            </div>
+          </div>
+          <div class="records-pagination">
+            <button class="pagination-button" :disabled="currentWithdrawalPage === 1" @click="currentWithdrawalPage--">
+              &lt;
+            </button>
+            <span class="page-info">
+              {{ currentWithdrawalPage }} / {{ totalWithdrawalPages }}
+            </span>
+            <button class="pagination-button" :disabled="currentWithdrawalPage === totalWithdrawalPages"
+              @click="currentWithdrawalPage++">
+              &gt;
+            </button>
+          </div>
+        </div>
+
+        <!-- 收益记录 -->
+        <div v-if="activeTab === 'earnings'">
+          <div class="records-list">
+            <div v-for="record in paginatedEarnings" :key="record.id" class="record-item">
+              <div class="record-info">
+                <div class="record-type">{{ record.type }}</div>
+                <div class="record-date">{{ formatDate(record.date) }}</div>
+              </div>
+              <div class="record-amount">+{{ formatNumber(record.amount) }} TIG</div>
+            </div>
+            <div v-if="earningsRecords.length === 0" class="no-records">
+              {{ t('wallet.noRecords') }}
+            </div>
+          </div>
+          <div class="records-pagination">
+            <button class="pagination-button" :disabled="currentEarningsPage === 1" @click="currentEarningsPage--">
+              &lt;
+            </button>
+            <span class="page-info">
+              {{ currentEarningsPage }} / {{ totalEarningsPages }}
+            </span>
+            <button class="pagination-button" :disabled="currentEarningsPage === totalEarningsPages"
+              @click="currentEarningsPage++">
+              &gt;
+            </button>
           </div>
         </div>
       </div>
@@ -114,15 +181,37 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch, onMounted, computed } from 'vue'
 import { userStore } from '@/stores/user'
 import { t } from '@/utils/i18n'
 import { formatDate, formatNumber, sleep } from '@/utils/helpers'
 import AppButton from '@/components/AppButton.vue'
+import { useEthers } from '@/composables/useWallet'
 
 type WithdrawType = 'personal' | 'team'
 
 const withdrawLoading = ref<WithdrawType | null>(null)
+const { walletState } = useEthers()
+const useUserStore = userStore();
+
+const userInfo = ref({
+  "Ua": {
+    "Addr": "",
+    "IdFlag": 0,
+    "Pid": 0,
+    "PidFlag": "",
+    "People": 0,
+    "UseProfit": 0,
+    "TotalProfit": 0,
+    "TeamPerformance": 0,
+    "Performance": 0,
+    "LevelPerformance": 0,
+    "Level": 0,
+    "CreateTime": ""
+  },
+  "PAddr": ""
+})
+
 
 const withdrawalRecords = reactive([
   {
@@ -163,6 +252,60 @@ const withdrawEarnings = async (type: WithdrawType): Promise<void> => {
     withdrawLoading.value = null
   }
 }
+
+// 新增的状态管理
+const activeTab = ref<'withdrawals' | 'earnings'>('withdrawals')
+const currentWithdrawalPage = ref(1)
+const currentEarningsPage = ref(1)
+const itemsPerPage = 5
+
+// 计算属性
+const paginatedWithdrawals = computed(() => {
+  const start = (currentWithdrawalPage.value - 1) * itemsPerPage
+  return withdrawalRecords.slice(start, start + itemsPerPage)
+})
+
+const totalWithdrawalPages = computed(() => {
+  return Math.ceil(withdrawalRecords.length / itemsPerPage)
+})
+
+const paginatedEarnings = computed(() => {
+  const start = (currentEarningsPage.value - 1) * itemsPerPage
+  return earningsRecords.slice(start, start + itemsPerPage)
+})
+
+const totalEarningsPages = computed(() => {
+  return Math.ceil(earningsRecords.length / itemsPerPage)
+})
+
+// 模拟数据
+const earningsRecords = [
+  // 你的收益记录数据
+]
+
+
+const fetchData = async () => {
+  console.log("用户地址", walletState.value.account)
+  if (!walletState.value.account) return
+  try {
+    userInfo.value = await useUserStore.getUserInfo(walletState.value.account);
+
+  } catch (err) {
+    console.error('Failed to fetch data:', err)
+
+  }
+}
+
+watch(() => walletState.value.isConnected, (connected) => {
+  if (connected) {
+    fetchData()
+  }
+})
+onMounted(() => {
+  if (walletState.value.isConnected) {
+    fetchData()
+  }
+})
 </script>
 
 <style scoped>
@@ -446,6 +589,88 @@ const withdrawEarnings = async (type: WithdrawType): Promise<void> => {
     /* flex-direction: column; */
     align-items: flex-start;
     gap: 0.5rem;
+  }
+}
+
+
+/* 新增的样式 - 完全匹配现有风格 */
+.records-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.records-tabs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tab-button {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.tab-button.active {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.records-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+  gap: 1rem;
+}
+
+.pagination-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pagination-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.no-records {
+  text-align: center;
+  padding: 1rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9rem;
+}
+
+/* 保持原有响应式设计 */
+@media (max-width: 480px) {
+  .records-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .records-tabs {
+    width: 100%;
+  }
+
+  .tab-button {
+    flex: 1;
+    text-align: center;
   }
 }
 </style>

@@ -2,9 +2,10 @@
   <div class="shop-page">
     <div class="shop-header">
       <h1 class="page-title">{{ t('investment.title') }}</h1>
+      <AppButton variant="purple">我的背包</AppButton>
     </div>
     <div class="plans-container">
-      <div v-for="plan in shopList.value" :key="plan.Id" class="plan-card">
+      <div v-for="(plan, key) in shopList.value" :key="key" class="plan-card">
         <div class="plan-header">
           <div class="plan-left">
             <h3 class="plan-name">{{ plan.Name }}</h3>
@@ -33,12 +34,12 @@
         </div>
 
         <AppButton variant="cyan" class="purchase-btn" @click="handlePurchaseClick(plan)">
-          {{ userInfo.PAddr?t('investment.purchase'):"绑定邀请地址" }}{{ showInviteBindModal }}
+          {{ userInfo.PAddr ? t('investment.purchase') : "绑定邀请地址" }}
         </AppButton>
       </div>
     </div>
     <!-- Invite Bind Modal -->
-    
+
     <InviteBindModal :is-visible="showInviteBindModal" @close="closeInviteBindModal"
       @bind-success="handleBindSuccess" />
     <!-- Purchase Modal -->
@@ -69,8 +70,8 @@ const inviteAddress = ref('')
 const shopList = ref<Array<Object> | []>
 const userInfo = ref({});
 
-const handlePurchaseClick = (plan: InvestmentPlan): void => {
-  selectedPlan.value = plan
+const handlePurchaseClick = async (plan): Promise<void> => {
+  selectedPlan.value = plan;
 
   // Check if user has bound invite address
   // if (!walletState.isConnected) {
@@ -131,14 +132,15 @@ const fetchData = async () => {
   try {
     shopList.value = await useUserStore.getShopList();
     userInfo.value = await useUserStore.getUserInfo(walletState.value.account);
-    hasInviteAddress.value=userInfo.value.PAddr?true:false;
+    hasInviteAddress.value = userInfo.value.PAddr ? true : false;
+
+    console.log('shopList.value', shopList.value)
   } catch (error) {
     console.error('Failed to fetch data:', error)
   }
 }
 watch(() => walletState.value.isConnected, (connected) => {
   if (connected) {
-
     fetchData()
   }
 })
@@ -146,7 +148,6 @@ onMounted(() => {
   if (walletState.value.isConnected) {
     fetchData()
   }
-
 })
 </script>
 
@@ -159,6 +160,9 @@ onMounted(() => {
 .shop-header {
   padding: 1.5rem 1rem 1rem;
   background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .page-title {

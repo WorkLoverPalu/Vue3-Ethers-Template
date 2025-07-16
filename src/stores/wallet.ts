@@ -1,23 +1,16 @@
 import { defineStore } from 'pinia'
 import { ethers } from 'ethers'
 import { markRaw } from 'vue'
-interface WalletState {
-    provider: ethers.providers.Web3Provider | null
-    signer: ethers.Signer | null
-    account: string
-    chainId: number
-    balance: string
-    isConnected: boolean
-}
 
 export const useWalletStore = defineStore('wallet', {
-    state: (): WalletState => ({
+    state: (): any => ({
         provider: null,
         signer: null,
         account: '',
         chainId: 0,
         balance: '0',
-        isConnected: false
+        isConnected: false,
+        buyShop: {},//购买详情
     }),
 
     actions: {
@@ -81,7 +74,15 @@ export const useWalletStore = defineStore('wallet', {
             this.chainId = parseInt(chainId, 16);
             // 推荐方式是重新初始化 provider 而不是强制刷新
             window.location.reload(); // 或 this.connectWallet() 重连
+        },
+        async setBuyShop(shop: any) {
+            console.log("buy shop", shop)
+            this.buyShop = shop;
         }
+
+    },
+    mutations: {
+
     }
 });
 

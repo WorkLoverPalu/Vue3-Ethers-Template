@@ -5,13 +5,13 @@
       <div class="current-level-section">
         <h3 class="section-title">{{ t('community.currentLevel') }}</h3>
         <div class="level-display">
-          <div class="level-badge">Lv{{ userStore.level.current }}</div>
+          <div class="level-badge">Lv{{ 1 }}</div>
           <div class="level-reward">{{ t('community.feeReward') }}: 20%</div>
           <div class="progress-container">
             <div class="progress-bar">
-              <div class="progress-fill" :style="{ width: `${userStore.level.progress}%` }"></div>
+              <div class="progress-fill" :style="{ width: `${1}%` }"></div>
             </div>
-            <div class="progress-text">{{ t('community.nextLevelDistance') }}: {{ 100 - userStore.level.progress }}%
+            <div class="progress-text">{{ t('community.nextLevelDistance') }}: {{ 100 - 1 }}%
             </div>
           </div>
         </div>
@@ -33,11 +33,11 @@
         <h3 class="section-title">{{ t('community.levelRequirements') }}</h3>
         <div class="requirements-list">
           <div v-for="level in levelRequirements" :key="level.level"
-            :class="['requirement-item', { 'current': level.level === userStore.level.current }]">
+            :class="['requirement-item', { 'current': level.level === 1 }]">
             <div class="requirement-header">
               <div class="requirement-level">
                 Lv{{ level.level }}
-                <span v-if="level.level === userStore.level.current" class="current-badge">{{ t('community.current')
+                <span v-if="level.level === 1" class="current-badge">{{ t('community.current')
                   }}</span>
               </div>
               <div class="requirement-reward">{{ level.reward }}%</div>
