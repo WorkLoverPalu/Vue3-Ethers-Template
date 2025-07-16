@@ -8,22 +8,16 @@
 
     <!-- Orders List -->
     <div class="orders-container">
-      <div v-if="orders.length === 0" class="empty-state">
-        <div class="empty-icon">📋</div>
-        <div class="empty-text">{{ t('orders.noOrders') }}</div>
-        <AppButton variant="cyan" @click="goToShop">
-          {{ t('orders.goShopping') }}
-        </AppButton>
-      </div>
 
-      <div v-else class="orders-list">
+
+      <div v-if="orders.length > 0" class="orders-list">
         <div v-for="order in orders" :key="order.Id" class="order-card">
           <div class="order-header">
             <div class="order-info">
               <div class="order-plan">A {{ order.EnergyId }}</div>
               <div class="order-date">{{ (order.CreateTime) }}</div>
             </div>
-           
+
           </div>
 
           <div class="order-details">
@@ -55,6 +49,13 @@
 
         </div>
       </div>
+      <div v-else class="empty-state">
+        <div class="empty-icon">📋</div>
+        <div class="empty-text">{{ t('orders.noOrders') }}</div>
+        <AppButton variant="cyan" @click="goToShop">
+          {{ t('orders.goShopping') }}
+        </AppButton>
+      </div>
     </div>
 
 
@@ -74,6 +75,7 @@ const { walletState } = useEthers()
 const router = useRouter()
 // Mock order data
 const orders = ref<any[]>([
+  {}
 ])
 const goToShop = (): void => {
   router.push('/shop')
@@ -123,12 +125,13 @@ onMounted(() => {
 
 
 /* Orders Container */
-.order-info{
+.order-info {
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .orders-container {
   padding: 0 1rem 2rem;
 }

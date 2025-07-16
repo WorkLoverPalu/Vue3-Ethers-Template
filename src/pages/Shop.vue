@@ -2,7 +2,7 @@
   <div class="shop-page">
     <div class="shop-header">
       <h1 class="page-title">{{ t('investment.title') }}</h1>
-      <AppButton variant="purple">我的背包</AppButton>
+      <AppButton variant="purple" @click="$router.push('/orders')">我的背包</AppButton>
     </div>
     <div class="plans-container">
       <div v-for="(plan, key) in shopList.value" :key="key" class="plan-card">

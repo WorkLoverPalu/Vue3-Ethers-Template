@@ -72,11 +72,11 @@
         </div>
         <div class="earning-item">
           <span class="earning-label">{{ t('dashboard.我的TIG资产') }}</span>
-          <span class="earning-value cyan">${{ formatNumber(chainInfo.tigBalance || 0) }}</span>
+          <span class="earning-value cyan">{{ formatNumber(chainInfo.tigBalance || 0) }} TIG</span>
         </div>
         <div class="earning-item">
           <span class="earning-label">{{ t('dashboard.我的NOS资产') }}</span>
-          <span class="earning-value cyan">${{ formatNumber(chainInfo.nosBalance || 0) }}</span>
+          <span class="earning-value cyan">{{ formatNumber(chainInfo.nosBalance || 0) }} NOS</span>
         </div>
       </div>
     </div>

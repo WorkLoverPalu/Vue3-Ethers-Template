@@ -138,7 +138,7 @@ const handleConfirm = async (): Promise<void> => {
             await tx.wait()
 
             emit('confirm', props.selectedPlan)
-            emit('close')
+
         } else {
             const tx = await Instance.value.approve();
             await tx.wait()
@@ -148,12 +148,7 @@ const handleConfirm = async (): Promise<void> => {
     } catch (error) {
         console.error('Purchase failed:', error)
 
-        if (!error.message || !error.message.includes('BigNumber')) {
-            alert(error.message || '交易失败')
-        } else {
-            isProcessing.value = true
-            emit('confirm', props.selectedPlan)
-        }
+        alert(error.message || '交易失败')
     } finally {
         isProcessing.value = false
     }
