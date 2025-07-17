@@ -12,8 +12,26 @@ export const useWalletStore = defineStore('wallet', {
         isConnected: false,
         buyShop: {},//购买详情
         inviteAddress: '',
-        apiUserInfo: {},
-        chainUserInfo: {}
+        apiUserInfo: {
+            "Ua": {
+                "Addr": "",
+                "IdFlag": 0,
+                "Pid": 1,
+                "PidFlag": "0",
+                "People": 0,
+                "UseProfit": 0,
+                "TotalProfit": 0,
+                "TeamProfit": 0,
+                "TeamPerformance": 0,
+                "Performance": 0,
+                "LevelPerformance": 0,
+                "Level": 0,
+                "CreateTime": "-"
+            },
+            "PAddr": "0x0000000000000000000000000000000000000000"
+        },
+        chainUserInfo: {},
+       
     }),
 
     actions: {

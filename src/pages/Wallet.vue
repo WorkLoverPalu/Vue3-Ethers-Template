@@ -10,7 +10,7 @@
         <div class="section-header">
           <div class="section-title">
             <span class="section-icon">📈</span>
-            <span>{{ t('wallet.personalEarnings') }}</span>
+            <span>{{ t('wallet.收益') }}</span>
           </div>
           <div class="last-withdrawal">
           </div>
@@ -22,7 +22,7 @@
               <span class="card-icon">🕐</span>
               <span class="card-title">{{ t('wallet.currentEarnings') }}</span>
             </div>
-            <div class="earning-amount green">{{ formatNumber(userInfo.Ua.UseProfit) }}</div>
+            <div class="earning-amount green">{{ formatNumber(walletState.apiUserInfo.Ua.UseProfit || 0) }}</div>
             <div class="earning-unit">TIG</div>
           </div>
 
@@ -31,20 +31,23 @@
               <span class="card-icon">✅</span>
               <span class="card-title">{{ t('wallet.historicalEarnings') }}</span>
             </div>
-            <div class="earning-amount blue">{{ formatNumber(userInfo.Ua.TotalProfit) }}</div>
+            <div class="earning-amount blue">{{ formatNumber(walletState.apiUserInfo.Ua.TotalProfit || 0) }}</div>
             <div class="earning-unit">TIG</div>
           </div>
         </div>
-
-
       </div>
+
+      <AppButton variant="purple" class="withdraw-btn" :loading="withdrawLoading === 'team'"
+        @click="withdrawEarnings('team')">
+        {{ t('wallet.withdraw') }} TIG
+      </AppButton>
 
       <!-- Team Earnings Section -->
       <div class="earnings-section">
         <div class="section-header">
           <div class="section-title">
             <span class="section-icon">👥</span>
-            <span>{{ t('wallet.teamEarnings') }}</span>
+            <span>{{ t('wallet.历史收益') }}</span>
           </div>
           <!-- <div class="last-withdrawal">
             <span>{{ t('wallet.lastWithdrawal') }}</span>
@@ -55,30 +58,39 @@
         <div class="earnings-cards">
           <div class="earning-card">
             <div class="card-header">
-              <span class="card-icon">🕐</span>
-              <span class="card-title">{{ t('wallet.currentEarnings') }}</span>
+              <span class="card-icon">💰</span>
+              <span class="card-title">{{ t('wallet.静态收益') }}</span>
             </div>
-            <div class="earning-amount purple">{{ formatNumber(userInfo.Ua.TeamProfit || 0) }}</div>
+            <div class="earning-amount purple">{{ formatNumber(itemDetails[0].total) }}</div>
             <div class="earning-unit">TIG</div>
           </div>
-
           <div class="earning-card">
             <div class="card-header">
-              <span class="card-icon">✅</span>
-              <span class="card-title">{{ t('wallet.historicalEarnings') }}</span>
+              <span class="card-icon">👥</span>
+              <span class="card-title">{{ t('wallet.团队收益') }}</span>
             </div>
-            <div class="earning-amount blue">{{ formatNumber(userInfo.Ua.TeamPerformance) }}</div>
+            <div class="earning-amount blue">{{ formatNumber(itemDetails[1].total) }}</div>
+            <div class="earning-unit">TIG</div>
+          </div>
+          <div class="earning-card">
+            <div class="card-header">
+              <span class="card-icon">🎁</span>
+              <span class="card-title">{{ t('wallet.分红收益') }}</span>
+            </div>
+            <div class="earning-amount blue">{{ formatNumber(itemDetails[2].total) }}</div>
+            <div class="earning-unit">TIG</div>
+          </div>
+          <div class="earning-card">
+            <div class="card-header">
+              <span class="card-icon">💵 </span>
+              <span class="card-title">{{ t('wallet.总收益') }}</span>
+            </div>
+            <div class="earning-amount blue">{{
+              formatNumber(itemDetails[0].total + itemDetails[1].total + itemDetails[2].total) }}</div>
             <div class="earning-unit">TIG</div>
           </div>
         </div>
-
-
       </div>
-
-      <AppButton variant="purple" class="withdraw-btn" :loading="withdrawLoading === 'team'"
-        @click="withdrawEarnings('team')">
-        {{ t('wallet.withdraw') }} {{ formatNumber(userInfo.Ua.TeamPerformance) }} TIG
-      </AppButton>
 
       <!-- Withdrawal Instructions -->
       <div class="withdrawal-instructions">
@@ -88,61 +100,48 @@
           <li>{{ t('wallet.instruction2') }}</li>
           <li>{{ t('wallet.instruction3') }}</li>
           <li>{{ t('wallet.instruction4') }}</li>
-          <li>{{ t('wallet.instruction5') }}</li>
         </ul>
       </div>
-
-      <!-- Recent Withdrawal Records -->
-      <!-- <div class="withdrawal-records">
-        <h3 class="records-title">{{ t('wallet.recentWithdrawals') }}</h3>
-        <div class="records-list">
-          <div v-for="record in withdrawalRecords" :key="record.id" class="record-item">
-            <div class="record-info">
-              <div class="record-type">{{ record.type }}</div>
-              <div class="record-date">{{ formatDate(record.date) }}</div>
-            </div>
-            <div class="record-amount">+{{ formatNumber(record.amount) }} TIG</div>
-          </div>
-        </div>
-      </div> -->
       <!-- 修改记录部分为 Tab 标签页 -->
       <div class="withdrawal-records">
         <div class="records-header">
           <h3 class="records-title">{{ t('wallet.recentWithdrawals') }}</h3>
           <div class="records-tabs">
-            <button class="tab-button" :class="{ active: activeTab === 'withdrawals' }"
-              @click="activeTab = 'withdrawals'">
+            <button class="tab-button" :class="{ active: activeTab === 'earnings' }" @click="activeTab = 'earnings'">
               {{ t('wallet.收益记录') }}
             </button>
-            <button class="tab-button" :class="{ active: activeTab === 'earnings' }" @click="activeTab = 'earnings'">
+            <button class="tab-button" :class="{ active: activeTab === 'withdrawals' }"
+              @click="activeTab = 'withdrawals'">
               {{ t('wallet.提取记录') }}
             </button>
+
           </div>
         </div>
 
         <!-- 提取记录 -->
         <div v-if="activeTab === 'withdrawals'">
           <div class="records-list">
-            <div v-for="record in paginatedWithdrawals" :key="record.id" class="record-item">
+            <div v-for="record in withdrawalRecords.dataList" :key="record.Id" class="record-item">
               <div class="record-info">
-                <div class="record-type">{{ record.type }}</div>
-                <div class="record-date">{{ formatDate(record.date) }}</div>
+                <div class="record-type">{{ ["","静态奖励","团队奖励","分红奖励"][record.Ty] }}</div>
+                <div class="record-date">{{ record.CreateTime }}</div>
               </div>
-              <div class="record-amount">+{{ formatNumber(record.amount) }} TIG</div>
+              <div class="record-amount">- {{ formatNumber(record.Amount) }} TIG</div>
             </div>
-            <div v-if="withdrawalRecords.length === 0" class="no-records">
+            <div v-if="withdrawalRecords.dataList.length === 0" class="no-records">
               {{ t('wallet.noRecords') }}
             </div>
           </div>
           <div class="records-pagination">
-            <button class="pagination-button" :disabled="currentWithdrawalPage === 1" @click="currentWithdrawalPage--">
+            <button class="pagination-button" :disabled="withdrawalRecords.size + 1 === 1" @click="prevPage">
               &lt;
             </button>
             <span class="page-info">
-              {{ currentWithdrawalPage }} / {{ totalWithdrawalPages }}
+              {{ withdrawalRecords.size + 1 }} / {{ Math.ceil(withdrawalRecords.total / withdrawalRecords.limit) }}
             </span>
-            <button class="pagination-button" :disabled="currentWithdrawalPage === totalWithdrawalPages"
-              @click="currentWithdrawalPage++">
+            <button class="pagination-button"
+              :disabled="withdrawalRecords.size + 1 === withdrawalRecords.total / withdrawalRecords.limit"
+              @click="nextPage">
               &gt;
             </button>
           </div>
@@ -151,26 +150,26 @@
         <!-- 收益记录 -->
         <div v-if="activeTab === 'earnings'">
           <div class="records-list">
-            <div v-for="record in paginatedEarnings" :key="record.id" class="record-item">
+            <div v-for="record in earningRecords.dataList" :key="record.Id" class="record-item">
               <div class="record-info">
-                <div class="record-type">{{ record.type }}</div>
-                <div class="record-date">{{ formatDate(record.date) }}</div>
+                <div class="record-type">{{ ["","静态奖励","团队奖励","分红奖励"][record.Ty] }}</div>
+                <div class="record-date">{{ record.CreateTime }}</div>
               </div>
-              <div class="record-amount">+{{ formatNumber(record.amount) }} TIG</div>
+              <div class="record-amount">+{{ formatNumber(record.Amount) }} TIG</div>
             </div>
-            <div v-if="earningsRecords.length === 0" class="no-records">
+            <div v-if="earningRecords.dataList.length === 0" class="no-records">
               {{ t('wallet.noRecords') }}
             </div>
           </div>
           <div class="records-pagination">
-            <button class="pagination-button" :disabled="currentEarningsPage === 1" @click="currentEarningsPage--">
+            <button class="pagination-button" :disabled="earningRecords.size + 1 === 1" @click="prevPage">
               &lt;
             </button>
             <span class="page-info">
-              {{ currentEarningsPage }} / {{ totalEarningsPages }}
+              {{ earningRecords.size + 1 }} / {{ Math.ceil(earningRecords.total / earningRecords.limit) }}
             </span>
-            <button class="pagination-button" :disabled="currentEarningsPage === totalEarningsPages"
-              @click="currentEarningsPage++">
+            <button class="pagination-button"
+              :disabled="earningRecords.size === earningRecords.total / earningRecords.limit" @click="nextPage">
               &gt;
             </button>
           </div>
@@ -187,55 +186,64 @@ import { t } from '@/utils/i18n'
 import { formatDate, formatNumber, sleep } from '@/utils/helpers'
 import AppButton from '@/components/AppButton.vue'
 import { useEthers } from '@/composables/useWallet'
+import request from '@/utils/request'
 
 type WithdrawType = 'personal' | 'team'
 
 const withdrawLoading = ref<WithdrawType | null>(null)
 const { walletState } = useEthers()
-const useUserStore = userStore();
-
-const userInfo = ref({
-  "Ua": {
-    "Addr": "",
-    "IdFlag": 0,
-    "Pid": 0,
-    "PidFlag": "",
-    "People": 0,
-    "UseProfit": 0,
-    "TotalProfit": 0,
-    "TeamPerformance": 0,
-    "Performance": 0,
-    "LevelPerformance": 0,
-    "Level": 0,
-    "CreateTime": ""
-  },
-  "PAddr": ""
-})
 
 
-const withdrawalRecords = reactive([
+const itemDetails = ref([
   {
-    id: 1,
-    type: '个人收益',
-    amount: 125.6,
-    date: new Date('2024-01-15 14:30'),
-    status: 'completed'
+    "ty": 1,
+    "total": 0
   },
   {
-    id: 2,
-    type: '团队收益',
-    amount: 67.8,
-    date: new Date('2024-01-12 09:15'),
-    status: 'completed'
+    "ty": 2,
+    "total": 0
   },
   {
-    id: 3,
-    type: '个人收益',
-    amount: 89.3,
-    date: new Date('2024-01-08 16:45'),
-    status: 'completed'
+    "ty": 3,
+    "total": 0
   }
 ])
+
+
+const withdrawalRecords = ref(
+  {
+    limit: 10,
+    "size": 0,
+    "total": 0,
+    "Sum": null,
+    "dataList": [
+      {
+        "Id": 3,
+        "Addr": "0xd6172335fad652A932544CD8dc0C41698501e1E8",
+        "Amount": 7,
+        "Ty": 2,
+        "CreateTime": "2025-07-15 11:32:38"
+      },
+    ]
+  }
+)
+const earningRecords = ref(
+  {
+    limit: 10,
+    "size": 0,
+    "total": 0,
+    "Sum": null,
+    "dataList": [
+      {
+        "Id": 3,
+        "Addr": "0xd6172335fad652A932544CD8dc0C41698501e1E8",
+        "Amount": 7,
+        "Ty": 2,
+        "CreateTime": "2025-07-15 11:32:38"
+      },
+    ]
+  }
+)
 
 const withdrawEarnings = async (type: WithdrawType): Promise<void> => {
   withdrawLoading.value = type
@@ -255,44 +263,62 @@ const withdrawEarnings = async (type: WithdrawType): Promise<void> => {
 
 // 新增的状态管理
 const activeTab = ref<'withdrawals' | 'earnings'>('withdrawals')
-const currentWithdrawalPage = ref(1)
-const currentEarningsPage = ref(1)
-const itemsPerPage = 5
 
-// 计算属性
-const paginatedWithdrawals = computed(() => {
-  const start = (currentWithdrawalPage.value - 1) * itemsPerPage
-  return withdrawalRecords.slice(start, start + itemsPerPage)
-})
 
-const totalWithdrawalPages = computed(() => {
-  return Math.ceil(withdrawalRecords.length / itemsPerPage)
-})
+const fetchEarnings = async () => {
+  //收益记录
+  let earningsRecordsRes = await request.post(`/GetPledgeBill?addr=${walletState.value.account}&size=${earningRecords.value.size}&limit=${earningRecords.value.limit}`);
+  earningRecords.value = earningsRecordsRes.data;
+  console.log("结果 earningsRecordsRes", earningRecords.value)
+}
+const fetchwithdrawal = async () => {
+  //收益记录
+  let withdrawalRecordsRes = await request.post(`/GetWithdrawalBill?addr=${walletState.value.account}&size=${withdrawalRecords.value.size}&limit=${withdrawalRecords.value.limit}`);
+  withdrawalRecords.value = withdrawalRecordsRes.data;
+  console.log("结果 earningsRecordsRes", withdrawalRecords.value)
+}
+const nextPage = async () => {
+  if (activeTab.value === 'earnings') {
+    if ((earningRecords.value.size + 1) * earningRecords.value.limit < earningRecords.value.total) {
+      earningRecords.value.size += 1;
+      await fetchEarnings();
+    }
+  } else {
+    if ((withdrawalRecords.value.size + 1) * withdrawalRecords.value.limit < withdrawalRecords.value.total) {
+      withdrawalRecords.value.size += 1;
+      await fetchwithdrawal();
+    }
+  }
+}
 
-const paginatedEarnings = computed(() => {
-  const start = (currentEarningsPage.value - 1) * itemsPerPage
-  return earningsRecords.slice(start, start + itemsPerPage)
-})
+const prevPage = async () => {
+  if (activeTab.value === 'earnings') {
+    if (earningRecords.value.size > 0) {
+      earningRecords.value.size -= 1;
+      await fetchEarnings();
+    }
+  } else {
+    if (withdrawalRecords.value.size > 0) {
+      withdrawalRecords.value.size -= 1;
+      await fetchwithdrawal();
+    }
+  }
 
-const totalEarningsPages = computed(() => {
-  return Math.ceil(earningsRecords.length / itemsPerPage)
-})
-
-// 模拟数据
-const earningsRecords = [
-  // 你的收益记录数据
-]
-
+}
 
 const fetchData = async () => {
-  console.log("用户地址", walletState.value.account)
   if (!walletState.value.account) return
   try {
-    userInfo.value = await useUserStore.getUserInfo(walletState.value.account);
+    //流水统计
+    let itemDetailsRes = await request.post(`/ItemDetails?addr=${walletState.value.account}`);
+    itemDetails.value = itemDetailsRes.data;
+    console.log("结果 itemDetailsRes", itemDetails.value)
+
+    await fetchEarnings();
+    await fetchwithdrawal();
 
   } catch (err) {
     console.error('Failed to fetch data:', err)
-
   }
 }
 

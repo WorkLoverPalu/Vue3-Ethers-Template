@@ -10,12 +10,12 @@
             <div class="stat-label">{{ t('team.有效团队人数') }}</div>
           </div>
           <div class="stat-item">
-            <div class="stat-value green">{{ formatNumber(team.teamPerformance) }}</div>
-            <div class="stat-label">{{ t('team.团队总业绩') }} (USDT)</div>
+            <div class="stat-value green">{{ formatNumber(walletState.apiUserInfo.Ua.Performance) }}</div>
+            <div class="stat-label">{{ t('team.个人业绩') }}</div>
           </div>
           <div class="stat-item">
-            <div class="stat-value purple">{{ formatNumber(team.totalProfit) }}</div>
-            <div class="stat-label">{{ t('team.团队总收益') }} (TIG)</div>
+            <div class="stat-value purple">{{ formatNumber(walletState.apiUserInfo.Ua.TeamPerformance) }}</div>
+            <div class="stat-label">{{ t('team.团队业绩') }} (TIG)</div>
           </div>
         </div>
       </div>
@@ -62,12 +62,12 @@
         <div class="members-list">
           <div v-for="member in team.dataList" :key="member.id" class="member-item">
             <div class="member-info">
-              <div class="member-name">{{ shortAddress(member.Addr) }}</div>
+              <div class="member-name">{{ shortAddress(member.Addr) }} </div>
               <div class="member-date">{{ member.CreateTime }}</div>
             </div>
             <div class="member-details">
-              <div class="member-level">{{ t('team.个人业绩') }}</div>
-              <div class="member-amount">{{ member.Performance }} USDT</div>
+              <div class="member-level"> LV {{ member.Level }}</div>
+              <div class="member-amount">{{ t('team.业绩') }} {{ member.Performance }}</div>
             </div>
           </div>
           <div v-if="team.dataList.length === 0" class="no-members">
@@ -92,11 +92,9 @@ const withdrawLoading = ref(false)
 const { walletState } = useEthers()
 const invitationLink = ref(null);
 const team = ref<any>({
-  "limit": 10,
+  "limit": 8,
   "size": 0, // current page (0-based)
   "total": 0,
-  "totalProfit": 0,
-  "teamPerformance": 0,
   "dataList": []
 })
 
@@ -114,10 +112,6 @@ const fetchData = async () => {
     const res = await request.post(`/Team?addr=${walletState.value.account}&limit=${team.value.limit}&size=${team.value.size}`);
     let teamInfo = {
       ...res.data,
-      totalProfit: res.data.dataList
-        .reduce((sum, item) => sum + item.TotalProfit, 0),
-      teamPerformance: res.data.dataList
-        .reduce((sum, item) => sum + item.TeamPerformance, 0),
     }
     team.value = teamInfo;
   } catch (error) {

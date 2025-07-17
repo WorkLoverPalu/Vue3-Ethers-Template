@@ -44,21 +44,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Reward Statistics -->
-      <div class="reward-statistics">
-        <h3 class="section-title">{{ t('community.rewardStatistics') }}</h3>
-        <div class="stats-row">
-          <div class="stat-item">
-            <div class="stat-value green">{{ formatNumber(walletState.apiUserInfo.Ua.Performance) }}</div>
-            <div class="stat-label">{{ t('community.个人业绩') }} </div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value orange">{{ formatNumber(walletState.apiUserInfo.Ua.TeamPerformance) }}</div>
-            <div class="stat-label">{{ t('community.团队业绩') }} </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -286,48 +271,6 @@ const levelRequirements = reactive([
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.5);
   text-align: right;
-}
-
-/* Reward Statistics */
-.reward-statistics {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.stats-row {
-  display: flex;
-  /* outline: solid 1px red; */
-  /* justify-content: space-between; */
-  /* align-items: center; */
-}
-
-.stat-item {
-  text-align: center;
-  flex: 1;
-}
-
-.stat-value {
-  font-size: 1.8rem;
-  font-weight: bold;
-  line-height: 1.2;
-  margin-bottom: 0.5rem;
-}
-
-.stat-value.green {
-  color: #00e676;
-}
-
-.stat-value.orange {
-  color: #ff9800;
-}
-
-.stat-label {
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 500;
 }
 
 /* Responsive adjustments */
