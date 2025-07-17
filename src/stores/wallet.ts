@@ -121,6 +121,9 @@ export const useWalletStore = defineStore('wallet', {
             console.log("UserInfo response", response)
             return response.data;
         },
+        async clearUseProfit(){
+            this.apiUserInfo.Ua.UseProfit=0
+        }
     },
     mutations: {
 

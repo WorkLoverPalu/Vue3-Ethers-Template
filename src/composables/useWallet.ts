@@ -17,6 +17,7 @@ export function useEthers() {
     connectWallet: walletStore.connectWallet,
     disconnectWallet: walletStore.disconnectWallet,
     setApiUserInfo: walletStore.setApiUserInfo,
+    clearUseProfit: walletStore.clearUseProfit,
     walletState: computed(() => ({
       account: walletStore.account,
       chainId: walletStore.chainId,

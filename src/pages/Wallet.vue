@@ -29,7 +29,7 @@
           <div class="earning-card">
             <div class="card-header">
               <span class="card-icon">✅</span>
-              <span class="card-title">{{ t('wallet.historicalEarnings') }}</span>
+              <span class="card-title">{{ t('wallet.累计收益') }}</span>
             </div>
             <div class="earning-amount blue">{{ formatNumber(walletState.apiUserInfo.Ua.TotalProfit || 0) }}</div>
             <div class="earning-unit">TIG</div>
@@ -37,8 +37,7 @@
         </div>
       </div>
 
-      <AppButton variant="purple" class="withdraw-btn" :loading="withdrawLoading === 'team'"
-        @click="withdrawEarnings('team')">
+      <AppButton variant="purple" class="withdraw-btn" :loading="withdrawLoading" @click="withdrawEarnings('team')">
         {{ t('wallet.withdraw') }} TIG
       </AppButton>
 
@@ -123,7 +122,7 @@
           <div class="records-list">
             <div v-for="record in withdrawalRecords.dataList" :key="record.Id" class="record-item">
               <div class="record-info">
-                <div class="record-type">{{ ["","静态奖励","团队奖励","分红奖励"][record.Ty] }}</div>
+                <div class="record-type">{{ ["", "静态奖励", "团队奖励", "分红奖励"][record.Ty] }}</div>
                 <div class="record-date">{{ record.CreateTime }}</div>
               </div>
               <div class="record-amount">- {{ formatNumber(record.Amount) }} TIG</div>
@@ -152,7 +151,7 @@
           <div class="records-list">
             <div v-for="record in earningRecords.dataList" :key="record.Id" class="record-item">
               <div class="record-info">
-                <div class="record-type">{{ ["","静态奖励","团队奖励","分红奖励"][record.Ty] }}</div>
+                <div class="record-type">{{ ["", "静态奖励", "团队奖励", "分红奖励"][record.Ty] }}</div>
                 <div class="record-date">{{ record.CreateTime }}</div>
               </div>
               <div class="record-amount">+{{ formatNumber(record.Amount) }} TIG</div>
@@ -188,10 +187,8 @@ import AppButton from '@/components/AppButton.vue'
 import { useEthers } from '@/composables/useWallet'
 import request from '@/utils/request'
 
-type WithdrawType = 'personal' | 'team'
-
-const withdrawLoading = ref<WithdrawType | null>(null)
-const { walletState } = useEthers()
+const withdrawLoading = ref<boolean>(false)
+const { walletState, Instance, setApiUserInfo, clearUseProfit } = useEthers()
 
 
 const itemDetails = ref([
@@ -212,7 +209,7 @@ const itemDetails = ref([
 
 const withdrawalRecords = ref(
   {
-    limit: 10,
+    limit: 8,
     "size": 0,
     "total": 0,
     "Sum": null,
@@ -229,7 +226,7 @@ const withdrawalRecords = ref(
 )
 const earningRecords = ref(
   {
-    limit: 10,
+    limit: 8,
     "size": 0,
     "total": 0,
     "Sum": null,
@@ -245,24 +242,34 @@ const earningRecords = ref(
   }
 )
 
-const withdrawEarnings = async (type: WithdrawType): Promise<void> => {
-  withdrawLoading.value = type
+const withdrawEarnings = async (): Promise<void> => {
+  if (walletState.value.apiUserInfo.Ua.UseProfit > 0) {
+    withdrawLoading.value = true;
 
-  try {
-    // Simulate withdrawal process
-    await sleep(2000)
-    console.log('Withdrawing earnings:', type)
-    alert(`Successfully withdrew ${type} earnings!`)
-  } catch (error) {
-    console.error('Withdrawal failed:', error)
-    alert('Withdrawal failed!')
-  } finally {
-    withdrawLoading.value = null
+    let wiApiRes = await request.post(`/Withdrawal?&addr=${walletState.value.account}`);
+    console.log("res", wiApiRes)
+    let desInfo = await Instance.value?.decodeAes(wiApiRes.data, walletState.value.account);
+    console.log("desInfo", desInfo)
+    var s = desInfo.split("-");
+    console.log("s", s);
+    // 注意质押参数
+    const tx = await Instance.value.harvestEarningsToken(
+      s[1], s[2], s[3], s[4], s[0],
+    )
+    await tx.wait()
+
+    setTimeout(async () => {
+      withdrawLoading.value = false;
+      await clearUseProfit();
+    }, 500);
+
+  } else {
+    alert("暂无收益")
   }
 }
 
 // 新增的状态管理
-const activeTab = ref<'withdrawals' | 'earnings'>('withdrawals')
+const activeTab = ref<'withdrawals' | 'earnings'>('earnings')
 
 
 const fetchEarnings = async () => {
