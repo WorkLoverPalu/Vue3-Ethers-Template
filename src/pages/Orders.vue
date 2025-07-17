@@ -45,8 +45,6 @@
               <div class="progress-fill" :style="{ width: `${(order.SucDay / 600) * 100}%` }"></div>
             </div>
           </div>
-
-
         </div>
       </div>
       <div v-else class="empty-state">

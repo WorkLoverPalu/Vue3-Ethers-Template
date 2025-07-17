@@ -2,7 +2,7 @@
   <div class="shop-page">
     <div class="shop-header">
       <h1 class="page-title">{{ t('investment.title') }}</h1>
-      <AppButton variant="purple" @click="$router.push('/orders')">我的背包</AppButton>
+      <AppButton variant="purple" @click="$router.push('/orders')">{{ t('investment.我的背包') }}</AppButton>
     </div>
     <div class="plans-container">
       <div v-for="(plan, key) in shopList.value" :key="key" class="plan-card">
@@ -34,7 +34,7 @@
         </div>
 
         <AppButton variant="cyan" class="purchase-btn" @click="handlePurchaseClick(plan)">
-          {{ apiUserInfo.PAddr ? t('investment.purchase') : "绑定邀请地址" }}
+          {{ apiUserInfo.PAddr ? t('investment.purchase') : t('investment.绑定邀请地址') }}
         </AppButton>
       </div>
     </div>

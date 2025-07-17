@@ -212,7 +212,7 @@ const handleBind = async (): Promise<void> => {
             walletState.value.account,
             inviteAddress.value,
             signInfo,
-        ).then(res=> {
+        ).then(res => {
             console.log("bindAddress", res)
             if (res?.errCode == 0) {
                 isBinding.value = false

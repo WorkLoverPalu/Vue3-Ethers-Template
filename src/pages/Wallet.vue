@@ -48,10 +48,6 @@
             <span class="section-icon">👥</span>
             <span>{{ t('wallet.历史收益') }}</span>
           </div>
-          <!-- <div class="last-withdrawal">
-            <span>{{ t('wallet.lastWithdrawal') }}</span>
-            <span class="withdrawal-date">2024-01-12</span>
-          </div> -->
         </div>
 
         <div class="earnings-cards">

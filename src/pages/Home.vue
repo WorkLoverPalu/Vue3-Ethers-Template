@@ -9,7 +9,7 @@
           <span class="stat-title">{{ t('dashboard.个人业绩') }}</span>
           <div class="stat-icon lightning">⚡</div>
         </div>
-        <div class="stat-value">{{ walletState.apiUserInfo.Ua.Performance }} T</div>
+        <div class="stat-value">{{ walletState.apiUserInfo.Ua.Performance }} </div>
         <div class="stat-label">{{ t('dashboard.level') }}: A{{ walletState.apiUserInfo.Ua.LevelPerformance }}</div>
       </div>
 
@@ -19,7 +19,7 @@
           <span class="stat-title">{{ t('dashboard.团队业绩') }}</span>
           <div class="stat-icon trending">📈</div>
         </div>
-        <div class="stat-value">{{ formatNumber(walletState.apiUserInfo.Ua.TeamPerformance) }} T</div>
+        <div class="stat-value">{{ formatNumber(walletState.apiUserInfo.Ua.TeamPerformance) }}</div>
         <div class="stat-label"></div>
       </div>
 
@@ -94,7 +94,6 @@ import request from '@/utils/request'
 
 const router = useRouter()
 const { walletState, Instance } = useEthers()
-const error = ref<string | null>(null)
 const availableFee = ref<string | '0'>('0')
 const price = ref<string | '0'>('0')
 
@@ -113,7 +112,6 @@ const goToTrade = (): void => {
 const fetchData = async () => {
   if (!walletState.value.account) return
   try {
-    error.value = null
     // 加载手续费分红
     let availableFeeRes = await request.post(`/AvailableFee`);
     availableFee.value = (availableFeeRes.data).toString();
@@ -124,7 +122,6 @@ const fetchData = async () => {
 
   } catch (err) {
     console.error('Failed to fetch data:', err)
-    error.value = err instanceof Error ? err.message : '获取数据失败'
   }
 }
 

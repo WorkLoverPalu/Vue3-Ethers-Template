@@ -1,18 +1,11 @@
 
-import { reactive, ref } from "vue"
-import type {
-  UserStats,
-  UserLevel,
-} from "@/types"
+import { ref } from "vue"
 import request from '@/utils/request'
 import { defineStore } from 'pinia'
-
-
 
 export const userStore = defineStore('user', () => {
   const userInfo = ref({})
   const shopInfo = ref([])
-
 
   /**
    * @dev 获取用户信息
@@ -24,9 +17,6 @@ export const userStore = defineStore('user', () => {
     const response = await request.post(`/UserInfo?addr=${address}`)
     userInfo.value = response.data;
     console.log("UserInfo response", response)
-    if (response.errCode !== 0) {
-      throw new Error('获取用户数据失败')
-    }
     return response.data
   }
 
@@ -54,7 +44,7 @@ export const userStore = defineStore('user', () => {
   const getShopList = async () => {
     const response = await request.post(`/VoteInfo`)
     console.log("getShopList", response.data)
-    shopInfo.value=response.data
+    shopInfo.value = response.data
     return response.data
   }
 
@@ -62,7 +52,7 @@ export const userStore = defineStore('user', () => {
    * @dev 绑定邀请地址
    */
   const bindAddress = async (address, bindAddress, sign) => {
-    console.log("参数：",address, bindAddress, sign)
+    console.log("参数：", address, bindAddress, sign)
     const response = await request.post(`/BindAddress?address=${address}&bindAddress=${bindAddress}&sign=${sign}`)
     console.log("bindAddress", response.data)
     return response
