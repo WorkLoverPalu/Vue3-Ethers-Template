@@ -102,6 +102,7 @@ const handleBindSuccess = (address: string): void => {
   inviteAddress.value = address
   hasInviteAddress.value = true
   showInviteBindModal.value = false
+  apiUserInfo.value.PAddr = address
 
   // Show success message
   alert(t('invite.bindSuccessMessage'))

@@ -6,16 +6,16 @@
         <h3 class="section-title">{{ t('team.statistics') }}</h3>
         <div class="stats-row">
           <div class="stat-item">
-            <div class="stat-value cyan">{{ teamStore.stats.totalMembers }}</div>
-            <div class="stat-label">{{ t('team.totalPeople') }}</div>
+            <div class="stat-value cyan">{{ team.total }}</div>
+            <div class="stat-label">{{ t('team.有效团队人数') }}</div>
           </div>
           <div class="stat-item">
-            <div class="stat-value green">{{ formatNumber(teamStore.stats.totalEarnings * 3) }}</div>
-            <div class="stat-label">{{ t('team.totalContribution') }} (USDT)</div>
+            <div class="stat-value green">{{ formatNumber(team.teamPerformance) }}</div>
+            <div class="stat-label">{{ t('team.团队总业绩') }} (USDT)</div>
           </div>
           <div class="stat-item">
-            <div class="stat-value purple">{{ formatNumber(teamStore.stats.totalEarnings) }}</div>
-            <div class="stat-label">{{ t('team.historicalRewards') }} (TIG)</div>
+            <div class="stat-value purple">{{ formatNumber(team.totalProfit) }}</div>
+            <div class="stat-label">{{ t('team.团队总收益') }} (TIG)</div>
           </div>
         </div>
       </div>
@@ -25,7 +25,7 @@
         <h3 class="section-title">{{ t('team.myInvitationLink') }}</h3>
         <div class="invitation-container">
           <div class="invitation-link">
-            <input type="text" :value="teamStore.invitationLink" readonly class="link-input">
+            <textarea type="text" :value="invitationLink" :rows="3" readonly class="link-input"></textarea>
             <button class="copy-btn" @click="copyInvitationLink">
               📋
             </button>
@@ -36,56 +36,72 @@
         </div>
       </div>
 
-      <!-- Team Members -->
-      <div class="team-members">
-        <h3 class="section-title">{{ t('team.teamMembers') }}</h3>
-        <div class="members-list">
-          <div v-for="member in teamStore.members" :key="member.id" class="member-item">
-            <div class="member-info">
-              <div class="member-name">{{ member.name }}</div>
-              <div class="member-date">{{ formatDate(member.joinDate) }}</div>
-            </div>
-            <div class="member-details">
-              <div class="member-level">{{ member.level }}</div>
-              <div class="member-amount">{{ member.amount }} USDT</div>
-            </div>
-          </div>
+      <div class="team-earnings">
+        <h3 class="section-title">{{ t('team.我的上级') }}</h3>
+        <div class="earnings-container">
+          {{ walletState.apiUserInfo.PAddr }}
         </div>
       </div>
 
-      <!-- Team Earnings -->
-      <div class="team-earnings">
-        <h3 class="section-title">{{ t('team.teamEarnings') }}</h3>
-        <div class="earnings-container">
-          <div class="earnings-info">
-            <div class="earnings-amount">{{ formatNumber(0) }} TIG</div>
-            <div class="earnings-label">{{ t('team.availableTeamEarnings') }}</div>
+      <!-- Team Members -->
+      <div class="team-members">
+        <div class="members-header">
+          <h3 class="section-title">{{ t('team.teamMembers') }}</h3>
+          <div class="pagination-controls">
+            <button class="pagination-btn" :disabled="team.size <= 0" @click="prevPage">
+              &lt;
+            </button>
+            <span class="page-info">
+              {{ team.size + 1 }} / {{ Math.ceil(team.total / team.limit) }}
+            </span>
+            <button class="pagination-btn" :disabled="(team.size + 1) * team.limit >= team.total" @click="nextPage">
+              &gt;
+            </button>
           </div>
-          <AppButton variant="purple" class="withdraw-btn" :loading="withdrawLoading" @click="withdrawTeamEarnings">
-            {{ t('team.withdrawTeamEarnings') }}
-          </AppButton>
         </div>
-        <ul class="earnings-rules">
-          <li>{{ t('team.earningsRule1') }}</li>
-          <li>{{ t('team.earningsRule2') }}</li>
-        </ul>
+        <div class="members-list">
+          <div v-for="member in team.dataList" :key="member.id" class="member-item">
+            <div class="member-info">
+              <div class="member-name">{{ shortAddress(member.Addr) }}</div>
+              <div class="member-date">{{ member.CreateTime }}</div>
+            </div>
+            <div class="member-details">
+              <div class="member-level">{{ t('team.个人业绩') }}</div>
+              <div class="member-amount">{{ member.Performance }} USDT</div>
+            </div>
+          </div>
+          <div v-if="team.dataList.length === 0" class="no-members">
+            {{ t('team.noMembers') }}
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { teamStore } from '@/stores/team'
-import { userStore } from '@/stores/user'
+import { ref, watch, onMounted } from 'vue'
 import { t, currentLang } from '@/utils/i18n'
-import { formatDate, copyToClipboard, formatNumber, sleep } from '@/utils/helpers'
+import { formatDate, copyToClipboard, } from '@/utils/helpers'
+import { shortAddress, formatNumber, sleep } from '@/utils/formatters'
 import AppButton from '@/components/AppButton.vue'
+import request from '@/utils/request'
+import { useEthers } from '@/composables/useWallet'
 
 const withdrawLoading = ref(false)
+const { walletState } = useEthers()
+const invitationLink = ref(null);
+const team = ref<any>({
+  "limit": 10,
+  "size": 0, // current page (0-based)
+  "total": 0,
+  "totalProfit": 0,
+  "teamPerformance": 0,
+  "dataList": []
+})
 
 const copyInvitationLink = async (): Promise<void> => {
-  const success = await copyToClipboard(teamStore.invitationLink)
+  const success = await copyToClipboard(invitationLink.value)
   if (success) {
     alert(currentLang.value === 'zh' ? '链接已复制' : 'Link copied')
   } else {
@@ -93,24 +109,103 @@ const copyInvitationLink = async (): Promise<void> => {
   }
 }
 
-const withdrawTeamEarnings = async (): Promise<void> => {
-  withdrawLoading.value = true
-
+const fetchData = async () => {
   try {
-    // Simulate withdrawal process
-    await sleep(2000)
-    console.log('Withdrawing team earnings')
-    alert('Successfully withdrew team earnings!')
+    const res = await request.post(`/Team?addr=${walletState.value.account}&limit=${team.value.limit}&size=${team.value.size}`);
+    let teamInfo = {
+      ...res.data,
+      totalProfit: res.data.dataList
+        .reduce((sum, item) => sum + item.TotalProfit, 0),
+      teamPerformance: res.data.dataList
+        .reduce((sum, item) => sum + item.TeamPerformance, 0),
+    }
+    team.value = teamInfo;
   } catch (error) {
-    console.error('Withdrawal failed:', error)
-    alert('Withdrawal failed!')
-  } finally {
-    withdrawLoading.value = false
+    console.error('Failed to fetch data:', error)
   }
 }
+
+const nextPage = () => {
+  if ((team.value.size + 1) * team.value.limit < team.value.total) {
+    team.value.size += 1
+    fetchData()
+  }
+}
+
+const prevPage = () => {
+  if (team.value.size > 0) {
+    team.value.size -= 1
+    fetchData()
+  }
+}
+
+watch(() => walletState.value.isConnected, (connected) => {
+  if (connected) {
+    fetchData()
+  }
+})
+
+onMounted(() => {
+  if (walletState.value.isConnected) {
+    fetchData()
+    invitationLink.value = `${window.location.origin}/#/?invite=${walletState.value.account}`
+  }
+})
 </script>
 
 <style scoped>
+/* Previous styles remain the same, add these new styles */
+
+.members-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pagination-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.no-members {
+  text-align: center;
+  padding: 2rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+}
+
+
+
 .team-page {
   min-height: 100vh;
   padding: 0 0 20px 0;
@@ -197,6 +292,7 @@ const withdrawTeamEarnings = async (): Promise<void> => {
   background: rgba(0, 0, 0, 0.3);
   border-radius: 12px;
   padding: 0.75rem;
+
 }
 
 .link-input {
@@ -284,7 +380,7 @@ const withdrawTeamEarnings = async (): Promise<void> => {
 .member-level {
   /* background: linear-gradient(45deg, #00d4ff, #5b86e5); */
   color: #00d4ff;
-  padding: 0.25rem 0.75rem;
+  /* padding: 0.25rem 0.75rem; */
   border-radius: 12px;
   font-size: 0.8rem;
   font-weight: 600;
@@ -310,7 +406,12 @@ const withdrawTeamEarnings = async (): Promise<void> => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
+  padding: 10px;
+  width: 100%;
+  word-break: break-word;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .earnings-info {
@@ -321,7 +422,7 @@ const withdrawTeamEarnings = async (): Promise<void> => {
 .earnings-amount {
   font-size: 1.8rem;
   font-weight: bold;
-  color: rgb(192 132 252 );
+  color: rgb(192 132 252);
   line-height: 1.2;
   margin-bottom: 0.25rem;
 }
@@ -331,13 +432,7 @@ const withdrawTeamEarnings = async (): Promise<void> => {
   color: rgba(255, 255, 255, 0.7);
 }
 
-.withdraw-btn {
-  padding: 0.75rem 1.5rem;
-  font-size: 0.9rem;
-  font-weight: 600;
-  border-radius: 12px;
-  white-space: nowrap;
-}
+
 
 .earnings-rules {
   list-style: none;
@@ -399,9 +494,7 @@ const withdrawTeamEarnings = async (): Promise<void> => {
     gap: 1rem;
   }
 
-  .withdraw-btn {
-    /* width: 100%; */
-  }
+
 
   .member-item {
     /* flex-direction: column; */

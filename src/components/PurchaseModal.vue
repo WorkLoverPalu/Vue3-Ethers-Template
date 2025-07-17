@@ -138,6 +138,7 @@ const handleConfirm = async (): Promise<void> => {
             await tx.wait()
 
             emit('confirm', props.selectedPlan)
+            emit('close')
 
         } else {
             const tx = await Instance.value.approve();

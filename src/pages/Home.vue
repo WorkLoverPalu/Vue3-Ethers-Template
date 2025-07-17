@@ -90,9 +90,11 @@ import { t } from '@/utils/i18n'
 import { formatNumber, shortAddress } from '@/utils/formatters'
 import { useRouter } from 'vue-router'
 import { useEthers } from '@/composables/useWallet'
+import request from '@/utils/request'
+
 
 const router = useRouter()
-const { walletState, Instance } = useEthers()
+const { walletState, Instance, setApiUserInfo } = useEthers()
 const useUserStore = userStore();
 const error = ref<string | null>(null)
 const availableFee = ref<string | 0>(0)
@@ -137,9 +139,13 @@ const fetchData = async () => {
   if (!walletState.value.account) return
   try {
     error.value = null
-    userInfo.value = await useUserStore.getUserInfo(walletState.value.account);
+    userInfo.value = await setApiUserInfo(walletState.value.account);
 
-    availableFee.value = await useUserStore.getAvailableFee();
+
+    // 加载手续费
+    let availableFeeRes = await request.post(`/AvailableFee`);
+    availableFee.value = availableFeeRes.data;
+
     let chainPrice = await Instance.value.getTokenPrice();
     let apiPrice = await useUserStore.getPrice();
     console.log("==", chainPrice, apiPrice)

@@ -89,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch,onMounted } from 'vue'
 import { t } from '@/utils/i18n'
 import { sleep, truncateAddress } from '@/utils/helpers'
 import AppButton from '@/components/AppButton.vue'
@@ -254,6 +254,14 @@ const resetForm = (): void => {
     isValidating.value = false
     isBinding.value = false
 }
+onMounted(() => {
+  if (walletState.value.isConnected) {
+    console.log("读取到的邀请地址",walletState.value)
+    if(walletState.value.inviteAddress){
+        inviteAddress.value=walletState.value.inviteAddress
+    }
+  }
+})
 </script>
 
 <style scoped>

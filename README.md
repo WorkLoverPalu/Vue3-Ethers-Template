@@ -27,3 +27,6 @@ npm run dev
 ```sh
 npm run build
 ```
+
+
+http://localhost:5173/#/?invite=0xd6172335fad652A932544CD8dc0C41698501e1E8

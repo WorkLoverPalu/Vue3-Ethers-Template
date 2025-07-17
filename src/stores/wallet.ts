@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ethers } from 'ethers'
 import { markRaw } from 'vue'
-
+import request from '@/utils/request'
 export const useWalletStore = defineStore('wallet', {
     state: (): any => ({
         provider: null,
@@ -11,12 +11,16 @@ export const useWalletStore = defineStore('wallet', {
         balance: '0',
         isConnected: false,
         buyShop: {},//购买详情
+        inviteAddress: '',
+        apiUserInfo: {},
+        chainUserInfo: {}
     }),
 
     actions: {
         async connectWallet() {
             if (typeof window !== 'undefined' && window.ethereum) {
                 try {
+
                     // ✅ 正确方式：直接使用 window.ethereum
                     const provider = markRaw(new ethers.providers.Web3Provider(window.ethereum, 'any'))
                     this.signer = markRaw(provider.getSigner())
@@ -39,6 +43,7 @@ export const useWalletStore = defineStore('wallet', {
                     // ✅ 绑定事件，确保 this 正确（使用箭头函数或 bind）
                     window.ethereum.on('accountsChanged', this.handleAccountsChanged.bind(this));
                     window.ethereum.on('chainChanged', this.handleChainChanged.bind(this));
+
 
                 } catch (error) {
                     console.error('Error connecting wallet:', error);
@@ -78,8 +83,26 @@ export const useWalletStore = defineStore('wallet', {
         async setBuyShop(shop: any) {
             console.log("buy shop", shop)
             this.buyShop = shop;
-        }
+        },
+        parseInviteFromURL() {
+            const hash = window.location.hash // 例如：#/team?invite=0x123...
+            const queryIndex = hash.indexOf('?')
+            if (queryIndex === -1) return null
 
+            const searchParams = new URLSearchParams(hash.substring(queryIndex + 1))
+            let inviteAddress = searchParams.get('invite')
+            if (inviteAddress) {
+                this.inviteAddress = inviteAddress
+            }
+            console.log("Invite::", this.inviteAddress)
+        },
+        async setApiUserInfo(address) {
+            if (!address) return
+            const response = await request.post(`/UserInfo?addr=${address}`)
+            this.apiUserInfo = response.data;
+            console.log("UserInfo response", response)
+            return response.data;
+        },
     },
     mutations: {
 

@@ -13,13 +13,18 @@ export function useEthers() {
   })
 
   return {
+    parseInviteFromURL: walletStore.parseInviteFromURL,
     connectWallet: walletStore.connectWallet,
     disconnectWallet: walletStore.disconnectWallet,
+    setApiUserInfo: walletStore.setApiUserInfo,
     walletState: computed(() => ({
       account: walletStore.account,
       chainId: walletStore.chainId,
       balance: walletStore.balance,
-      isConnected: walletStore.isConnected
+      isConnected: walletStore.isConnected,
+      inviteAddress: walletStore.inviteAddress,
+      apiUserInfo: walletStore.apiUserInfo,
+      chainUserInfo: walletStore.chainUserInfo,
     })),
     Instance
   }
