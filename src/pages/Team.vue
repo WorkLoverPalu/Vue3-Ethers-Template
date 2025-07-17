@@ -87,7 +87,10 @@ import { shortAddress, formatNumber, sleep } from '@/utils/formatters'
 import AppButton from '@/components/AppButton.vue'
 import request from '@/utils/request'
 import { useEthers } from '@/composables/useWallet'
+import { useToast } from '@/stores/useToast'
 
+
+const { showSuccess, showError } = useToast()
 const withdrawLoading = ref(false)
 const { walletState } = useEthers()
 const invitationLink = ref(null);
@@ -101,9 +104,9 @@ const team = ref<any>({
 const copyInvitationLink = async (): Promise<void> => {
   const success = await copyToClipboard(invitationLink.value)
   if (success) {
-    alert(currentLang.value === 'zh' ? '链接已复制' : 'Link copied')
+    showSuccess(currentLang.value === 'zh' ? '链接已复制' : 'Link copied')
   } else {
-    alert(currentLang.value === 'zh' ? '复制失败' : 'Copy failed')
+    showError(currentLang.value === 'zh' ? '复制失败' : 'Copy failed')
   }
 }
 

@@ -1,11 +1,20 @@
 <template>
   <div>
     <router-view />
+    <Toast 
+      v-model:visible="toastState.visible"
+      :message="toastState.message"
+      :type="toastState.type"
+      :duration="toastState.duration"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import router from './router'
+import Toast from '@/components/Toast.vue'
+import { useToast } from '@/stores/useToast'
+const { toastState, showSuccess, showError } = useToast()
 </script>
 
 <style>

@@ -73,7 +73,9 @@ import { formatNumber, sleep } from '@/utils/formatters'
 import AppButton from '@/components/AppButton.vue'
 import { useEthers } from '@/composables/useWallet'
 import request from '@/utils/request'
+import { useToast } from '@/stores/useToast'
 
+const { showSuccess, showError } = useToast()
 const { walletState, Instance } = useEthers()
 interface Props {
     isVisible: boolean
@@ -139,17 +141,14 @@ const handleConfirm = async (): Promise<void> => {
 
             emit('confirm', props.selectedPlan)
             emit('close')
-
         } else {
             const tx = await Instance.value.approve();
             await tx.wait()
             return emit('approve')
         }
-
     } catch (error) {
         console.error('Purchase failed:', error)
-
-        alert(error.message || '交易失败')
+        showError(error.message || '交易失败')
     } finally {
         isProcessing.value = false
     }

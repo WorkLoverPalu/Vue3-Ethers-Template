@@ -180,13 +180,14 @@
 
 <script setup lang="ts">
 import { ref, reactive, watch, onMounted, computed } from 'vue'
-import { userStore } from '@/stores/user'
 import { t } from '@/utils/i18n'
 import { formatDate, formatNumber, sleep } from '@/utils/helpers'
 import AppButton from '@/components/AppButton.vue'
 import { useEthers } from '@/composables/useWallet'
 import request from '@/utils/request'
+import { useToast } from '@/stores/useToast'
 
+const { showSuccess, showError } = useToast()
 const withdrawLoading = ref<boolean>(false)
 const { walletState, Instance, setApiUserInfo, clearUseProfit } = useEthers()
 
@@ -214,13 +215,6 @@ const withdrawalRecords = ref(
     "total": 0,
     "Sum": null,
     "dataList": [
-      {
-        "Id": 3,
-        "Addr": "0xd6172335fad652A932544CD8dc0C41698501e1E8",
-        "Amount": 7,
-        "Ty": 2,
-        "CreateTime": "2025-07-15 11:32:38"
-      },
     ]
   }
 )
@@ -231,40 +225,38 @@ const earningRecords = ref(
     "total": 0,
     "Sum": null,
     "dataList": [
-      {
-        "Id": 3,
-        "Addr": "0xd6172335fad652A932544CD8dc0C41698501e1E8",
-        "Amount": 7,
-        "Ty": 2,
-        "CreateTime": "2025-07-15 11:32:38"
-      },
     ]
   }
 )
 
 const withdrawEarnings = async (): Promise<void> => {
   if (walletState.value.apiUserInfo.Ua.UseProfit > 0) {
-    withdrawLoading.value = true;
+    try {
+      withdrawLoading.value = true;
 
-    let wiApiRes = await request.post(`/Withdrawal?&addr=${walletState.value.account}`);
-    console.log("res", wiApiRes)
-    let desInfo = await Instance.value?.decodeAes(wiApiRes.data, walletState.value.account);
-    console.log("desInfo", desInfo)
-    var s = desInfo.split("-");
-    console.log("s", s);
-    // 注意质押参数
-    const tx = await Instance.value.harvestEarningsToken(
-      s[1], s[2], s[3], s[4], s[0],
-    )
-    await tx.wait()
+      let wiApiRes = await request.post(`/Withdrawal?&addr=${walletState.value.account}`);
+      console.log("res", wiApiRes)
+      let desInfo = await Instance.value?.decodeAes(wiApiRes.data, walletState.value.account);
+      console.log("desInfo", desInfo)
+      var s = desInfo.split("-");
+      console.log("s", s);
+      // 注意质押参数
+      const tx = await Instance.value.harvestEarningsToken(
+        s[1], s[2], s[3], s[4], s[0],
+      )
+      await tx.wait()
 
-    setTimeout(async () => {
-      withdrawLoading.value = false;
-      await clearUseProfit();
-    }, 500);
-
+      setTimeout(async () => {
+        withdrawLoading.value = false;
+        await clearUseProfit();
+        showSuccess(t("tx.交易成功"))
+      }, 500);
+    } catch (error) {
+      console.error('Purchase failed:', error)
+      showError(error.message || t("tx.交易失败"))
+    }
   } else {
-    alert("暂无收益")
+    showError(t("tx.暂无收益"))
   }
 }
 

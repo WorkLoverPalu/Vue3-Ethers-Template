@@ -58,7 +58,9 @@ import InviteBindModal from '@/components/InviteBindModal.vue'
 import { useEthers } from '@/composables/useWallet'
 import { userStore } from '@/stores/user'
 import request from '@/utils/request'
+import { useToast } from '@/stores/useToast'
 
+const { showSuccess, showError } = useToast()
 const { walletState, Instance } = useEthers()
 const useUserStore = userStore();
 const showInviteBindModal = ref(false)
@@ -105,7 +107,7 @@ const handleBindSuccess = (address: string): void => {
   apiUserInfo.value.PAddr = address
 
   // Show success message
-  alert(t('invite.bindSuccessMessage'))
+  showSuccess(t('invite.bindSuccessMessage'))
 
   // Now show purchase modal
   if (selectedPlan.value) {
@@ -120,7 +122,7 @@ const closePurchaseModal = (): void => {
 
 const handlePurchaseConfirm = (plan: any): void => {
   console.log('Purchase confirmed for plan',)
-  alert(`Successfully purchased !`)
+  showSuccess(`Successfully purchased !`)
 }
 
 

@@ -32,7 +32,8 @@
             <div class="requirement-header">
               <div class="requirement-level">
                 Lv{{ level.level }}
-                <span v-if="level.level === walletState.apiUserInfo.Ua.Level" class="current-badge">{{ t('community.current')
+                <span v-if="level.level === walletState.apiUserInfo.Ua.Level" class="current-badge">{{
+                  t('community.current')
                   }}</span>
               </div>
               <div class="requirement-reward">{{ level.reward }}%</div>
@@ -50,10 +51,7 @@
 
 <script setup lang="ts">
 import { reactive } from 'vue'
-import { userStore } from '@/stores/user'
-import { communityStore } from '@/stores/community'
 import { t } from '@/utils/i18n'
-import { formatNumber } from '@/utils/helpers'
 import { useEthers } from '@/composables/useWallet'
 
 const { walletState } = useEthers()
