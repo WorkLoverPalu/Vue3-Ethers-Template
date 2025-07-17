@@ -18,6 +18,8 @@ export function useEthers() {
     disconnectWallet: walletStore.disconnectWallet,
     setApiUserInfo: walletStore.setApiUserInfo,
     clearUseProfit: walletStore.clearUseProfit,
+    getPrice: walletStore.getPrice,
+    setChainUserInfo: walletStore.setChainUserInfo,
     walletState: computed(() => ({
       account: walletStore.account,
       chainId: walletStore.chainId,
@@ -26,6 +28,7 @@ export function useEthers() {
       inviteAddress: walletStore.inviteAddress,
       apiUserInfo: walletStore.apiUserInfo,
       chainUserInfo: walletStore.chainUserInfo,
+      apiPrice: walletStore.apiPrice,
     })),
     Instance
   }

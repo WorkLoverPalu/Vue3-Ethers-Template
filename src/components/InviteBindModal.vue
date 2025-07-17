@@ -62,18 +62,7 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Benefits Section -->
-                <!-- <div class="benefits-section">
-                <h4 class="benefits-title">{{ t('invite.bindBenefits') }}</h4>
-                <ul class="benefits-list">
-                    <li>{{ t('invite.benefit1') }}</li>
-                    <li>{{ t('invite.benefit2') }}</li>
-                    <li>{{ t('invite.benefit3') }}</li>
-                </ul>
-                </div> -->
             </div>
-
             <!-- Action Buttons -->
             <div class="modal-actions">
                 <AppButton variant="secondary" @click="handleBind" :loading="isBinding" :disabled="!canBind">
@@ -89,11 +78,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch,onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { t } from '@/utils/i18n'
-import { sleep, truncateAddress } from '@/utils/helpers'
+import { sleep } from '@/utils/formatters'
 import AppButton from '@/components/AppButton.vue'
-import { encodeAes } from "@/utils/AES"
 import { useEthers } from '@/composables/useWallet'
 const { walletState, Instance } = useEthers()
 import { userStore } from '@/stores/user'
@@ -116,7 +104,7 @@ interface Emits {
 defineProps<Props>()
 const emit = defineEmits<Emits>()
 const useUserStore = userStore();
-const inviteAddress = ref('0x0000000000000000000000000000000000000000')
+const inviteAddress = ref('')
 const hasError = ref(false)
 const errorMessage = ref('')
 const isValidating = ref(false)
@@ -224,9 +212,9 @@ const handleBind = async (): Promise<void> => {
             walletState.value.account,
             inviteAddress.value,
             signInfo,
-        ).then(res => {
+        ).then(res=> {
             console.log("bindAddress", res)
-            if (res.errCode == 0) {
+            if (res?.errCode == 0) {
                 isBinding.value = false
                 // Success
                 emit('bind-success', inviteAddress.value)
@@ -234,7 +222,7 @@ const handleBind = async (): Promise<void> => {
             } else {
                 isBinding.value = false
                 hasError.value = true
-                errorMessage.value = t('invite.bindError')
+                errorMessage.value = res.data
             }
         })
     } catch (error) {
@@ -255,12 +243,12 @@ const resetForm = (): void => {
     isBinding.value = false
 }
 onMounted(() => {
-  if (walletState.value.isConnected) {
-    console.log("读取到的邀请地址",walletState.value)
-    if(walletState.value.inviteAddress){
-        inviteAddress.value=walletState.value.inviteAddress
+    if (walletState.value.isConnected) {
+        console.log("读取到的邀请地址", walletState.value)
+        if (walletState.value.inviteAddress) {
+            inviteAddress.value = walletState.value.inviteAddress
+        }
     }
-  }
 })
 </script>
 
@@ -431,7 +419,7 @@ onMounted(() => {
 .input-hint {
     font-size: 0.8rem;
     color: rgba(255, 255, 255, 0.6);
-    margin-top: 0.5rem;
+    margin: 0.5rem 0;
     line-height: 1.4;
 }
 

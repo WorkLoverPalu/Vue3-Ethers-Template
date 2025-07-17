@@ -1,13 +1,9 @@
 import { ethers } from 'ethers'
 import { formatUnits, parseUnits } from 'ethers/lib/utils'
-
-import { CONTRACT_ADDRESS, NOS_ADDRESS, ERC20_ABI, CONTRACT_ABI } from '@/contracts'
+import { CONTRACT_ADDRESS, NOS_ADDRESS, ERC20_ABI, CONTRACT_ABI, TRADE_URL } from '@/contracts'
 import { formatNumber, safeContractCall } from './formatters'
-import { SysInfo, NodeData, NodeInfo, UserInfo, Redemption } from '@/types/staking'
-
 
 import AES from './AES.js';
-
 
 // 调用句柄在 StakingContractService.value中
 export class StakingContractService {
@@ -15,6 +11,7 @@ export class StakingContractService {
     private ERC20Contract: ethers.Contract
     private provider: ethers.providers.Web3Provider | null = null
     private signer: ethers.Signer | null = null
+    public tradeUrl: string
 
     constructor(signerOrProvider: ethers.Signer | ethers.providers.Provider) {
         this.StakingContract = new ethers.Contract(
@@ -27,6 +24,7 @@ export class StakingContractService {
             ERC20_ABI,
             signerOrProvider
         )
+        this.tradeUrl = TRADE_URL;
 
         if (signerOrProvider instanceof ethers.providers.Web3Provider) {
             this.provider = signerOrProvider

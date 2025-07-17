@@ -25,7 +25,7 @@ import { useEthers } from '@/composables/useWallet'
 import type { Language } from '@/types'
 import { shortAddress } from '@/utils/formatters'
 
-const { connectWallet, walletState, parseInviteFromURL } = useEthers()
+const { connectWallet, walletState, parseInviteFromURL, setApiUserInfo, getPrice, Instance, setChainUserInfo } = useEthers()
 const selectedLang = ref<Language>('zh')
 
 const handleLanguageChange = (): void => {
@@ -33,9 +33,14 @@ const handleLanguageChange = (): void => {
 }
 
 const handleWalletConnection = async (): Promise<void> => {
-  if (!walletState.isConnected) {
+  if (!walletState.value.isConnected) {
     try {
       await connectWallet()
+      await setApiUserInfo(walletState.value.account);
+      await getPrice();
+
+      let chainInfo = await Instance.value.getAssetAndApprovalInfo(walletState.value.account);
+      await setChainUserInfo(chainInfo);
 
     } catch (error) {
       console.error('Wallet connection failed:', error)

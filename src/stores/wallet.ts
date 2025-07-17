@@ -15,23 +15,29 @@ export const useWalletStore = defineStore('wallet', {
         apiUserInfo: {
             "Ua": {
                 "Addr": "",
-                "IdFlag": 0,
-                "Pid": 1,
+                "IdFlag": "0",
+                "Pid": "1",
                 "PidFlag": "0",
-                "People": 0,
-                "UseProfit": 0,
-                "TotalProfit": 0,
-                "TeamProfit": 0,
-                "TeamPerformance": 0,
-                "Performance": 0,
-                "LevelPerformance": 0,
-                "Level": 0,
+                "People": "0",
+                "UseProfit": "0",
+                "TotalProfit": "0",
+                "TeamProfit": "0",
+                "TeamPerformance": "0",
+                "Performance": "0",
+                "LevelPerformance": "0",
+                "Level": " 0",
                 "CreateTime": "-"
             },
             "PAddr": "0x0000000000000000000000000000000000000000"
         },
-        chainUserInfo: {},
-       
+        chainUserInfo: {
+            nosBalance: "0",
+            nosAllowance: "0",
+            tigBalance: "0",
+            tigAllowance: "0",
+        },
+        apiPrice: "0",
+
     }),
 
     actions: {
@@ -121,9 +127,21 @@ export const useWalletStore = defineStore('wallet', {
             console.log("UserInfo response", response)
             return response.data;
         },
-        async clearUseProfit(){
-            this.apiUserInfo.Ua.UseProfit=0
+        async clearUseProfit() {
+            this.apiUserInfo.Ua.UseProfit = 0
+        },
+        /**
+         * @dev 获取价格
+         */
+        async getPrice() {
+            const response = await request.post(`/GetPledgePrice`)
+            this.apiPrice = response.data;
+            return response.data
+        },
+        async setChainUserInfo(obj) {
+            this.chainUserInfo = obj;
         }
+
     },
     mutations: {
 
