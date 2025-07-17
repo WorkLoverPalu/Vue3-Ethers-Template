@@ -5,15 +5,10 @@
       <div class="current-level-section">
         <h3 class="section-title">{{ t('community.currentLevel') }}</h3>
         <div class="level-display">
-          <div class="level-badge">Lv{{ 1 }}</div>
-          <div class="level-reward">{{ t('community.feeReward') }}: 20%</div>
-          <div class="progress-container">
-            <div class="progress-bar">
-              <div class="progress-fill" :style="{ width: `${1}%` }"></div>
-            </div>
-            <div class="progress-text">{{ t('community.nextLevelDistance') }}: {{ 100 - 1 }}%
-            </div>
-          </div>
+          <div class="level-badge">Lv {{ walletState.apiUserInfo.Ua.Level }}</div>
+          <div class="level-reward">{{ t('community.feeReward') }}:
+            {{ levelRequirements[walletState.apiUserInfo.Ua.Level].reward }} %</div>
+
         </div>
       </div>
 
@@ -33,17 +28,19 @@
         <h3 class="section-title">{{ t('community.levelRequirements') }}</h3>
         <div class="requirements-list">
           <div v-for="level in levelRequirements" :key="level.level"
-            :class="['requirement-item', { 'current': level.level === 1 }]">
+            :class="['requirement-item', { 'current': level.level === walletState.apiUserInfo.Ua.Level }]">
             <div class="requirement-header">
               <div class="requirement-level">
                 Lv{{ level.level }}
-                <span v-if="level.level === 1" class="current-badge">{{ t('community.current')
+                <span v-if="level.level === walletState.apiUserInfo.Ua.Level" class="current-badge">{{ t('community.current')
                   }}</span>
               </div>
               <div class="requirement-reward">{{ level.reward }}%</div>
             </div>
-            <div class="requirement-desc">{{ level.description }} <div class="reward-label">{{ t('community.reward') }}</div></div>
-            
+            <div class="requirement-desc">{{ level.description }} <div class="reward-label">{{ t('community.reward') }}
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -53,12 +50,12 @@
         <h3 class="section-title">{{ t('community.rewardStatistics') }}</h3>
         <div class="stats-row">
           <div class="stat-item">
-            <div class="stat-value green">{{ formatNumber(communityStore.stats.totalRewards) }}</div>
-            <div class="stat-label">{{ t('community.totalRewards') }} (TIG)</div>
+            <div class="stat-value green">{{ formatNumber(walletState.apiUserInfo.Ua.Performance) }}</div>
+            <div class="stat-label">{{ t('community.个人业绩') }} </div>
           </div>
           <div class="stat-item">
-            <div class="stat-value orange">{{ formatNumber(communityStore.stats.monthlyRewards) }}</div>
-            <div class="stat-label">{{ t('community.monthlyRewards') }} (TIG)</div>
+            <div class="stat-value orange">{{ formatNumber(walletState.apiUserInfo.Ua.TeamPerformance) }}</div>
+            <div class="stat-label">{{ t('community.团队业绩') }} </div>
           </div>
         </div>
       </div>
@@ -72,8 +69,15 @@ import { userStore } from '@/stores/user'
 import { communityStore } from '@/stores/community'
 import { t } from '@/utils/i18n'
 import { formatNumber } from '@/utils/helpers'
+import { useEthers } from '@/composables/useWallet'
 
+const { walletState } = useEthers()
 const levelRequirements = reactive([
+  {
+    level: 0,
+    reward: 0,
+    description: ''
+  },
   {
     level: 1,
     reward: 20,
@@ -105,7 +109,7 @@ const levelRequirements = reactive([
 <style scoped>
 .community-page {
   min-height: 100vh;
-  padding: 0  0 20px 0;
+  padding: 0 0 20px 0;
 }
 
 .community-content {
@@ -146,7 +150,6 @@ const levelRequirements = reactive([
 .level-reward {
   font-size: 1rem;
   color: white;
-  margin-bottom: 1.5rem;
   font-weight: 500;
 }
 
