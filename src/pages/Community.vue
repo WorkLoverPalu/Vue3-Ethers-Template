@@ -7,7 +7,7 @@
         <div class="level-display">
           <div class="level-badge">Lv {{ walletState.apiUserInfo.Ua.Level }}</div>
           <div class="level-reward">{{ t('community.feeReward') }}:
-            {{ levelRequirements[walletState.apiUserInfo.Ua.Level*1].reward }} %</div>
+            {{ levelRequirements[walletState.apiUserInfo.Ua.Level * 1].reward }} %</div>
 
         </div>
       </div>
@@ -34,11 +34,12 @@
                 Lv{{ level.level }}
                 <span v-if="level.level === walletState.apiUserInfo.Ua.Level" class="current-badge">{{
                   t('community.current')
-                  }}</span>
+                }}</span>
               </div>
               <div class="requirement-reward">{{ level.reward }}%</div>
             </div>
-            <div class="requirement-desc">{{ level.description }} <div class="reward-label">{{ t('community.reward') }}
+            <div class="requirement-desc">{{ level.level == 1 ? t('community.B区业绩5万U') : '' }} <div class="reward-label">{{
+              t('community.reward') }}
               </div>
             </div>
 
@@ -64,27 +65,27 @@ const levelRequirements = reactive([
   {
     level: 1,
     reward: 20,
-    description: 'B区业绩5万U'
+    description: ''
   },
   {
     level: 2,
     reward: 10,
-    description: '3个Lv1'
+    description: '3 * Lv1'
   },
   {
     level: 3,
     reward: 10,
-    description: '3个Lv2'
+    description: '3 * Lv2'
   },
   {
     level: 4,
     reward: 10,
-    description: '3个Lv3'
+    description: '3 * Lv3'
   },
   {
     level: 5,
     reward: 10,
-    description: '3个Lv4'
+    description: '3 * Lv4'
   }
 ])
 </script>

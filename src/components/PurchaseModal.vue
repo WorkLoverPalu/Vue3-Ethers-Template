@@ -50,15 +50,16 @@
 
             <!-- Action Buttons -->
             <div class="modal-actions">
-                <AppButton variant="secondary" class="cancel-btn" @click="handleCancel">
-                    {{ t('purchase.cancel') }}
-                </AppButton>
                 <AppButton variant="secondary" class="confirm-btn" :disabled="!canPurchase" :loading="isProcessing"
                     @click="handleConfirm">
                     {{ selectedPlan.nosAllowance * 1 >= selectedPlan.needAmount * 1 ? t('purchase.confirmPurchase') :
                         t('purchase.授权')
                     }}
                 </AppButton>
+                <AppButton variant="secondary" class="cancel-btn" @click="handleCancel">
+                    {{ t('purchase.cancel') }}
+                </AppButton>
+
 
 
             </div>

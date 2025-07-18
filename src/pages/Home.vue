@@ -84,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { t } from '@/utils/i18n'
 import { formatNumber, shortAddress } from '@/utils/formatters'
 import { useRouter } from 'vue-router'
@@ -95,8 +95,7 @@ import request from '@/utils/request'
 const router = useRouter()
 const { walletState, Instance } = useEthers()
 const availableFee = ref<string | '0'>('0')
-const price = ref<string | '0'>('0')
-
+const chainPrice = ref<string | '0'>('0')
 
 const goToOrders = (): void => {
   // Navigate to orders page or show orders modal
@@ -108,6 +107,10 @@ const goToTrade = (): void => {
   window.open(Instance.value.tradeUrl, '_blank');
 }
 
+const price = computed(() => {
+  let apiPrice = walletState.value.apiPrice;
+  return (apiPrice / Number(chainPrice.value)).toString();
+})
 
 const fetchData = async () => {
   if (!walletState.value.account) return
@@ -116,9 +119,8 @@ const fetchData = async () => {
     let availableFeeRes = await request.post(`/AvailableFee`);
     availableFee.value = (availableFeeRes.data).toString();
 
-    let chainPrice = await Instance.value.getTokenPrice();
-    let apiPrice = walletState.value.apiPrice;
-    price.value = (apiPrice / Number(chainPrice.price)).toString();
+    let chainPriceres = await Instance.value.getTokenPrice();
+    chainPrice.value = chainPriceres.price
 
   } catch (err) {
     console.error('Failed to fetch data:', err)

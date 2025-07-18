@@ -5,14 +5,14 @@
       <AppButton variant="purple" @click="$router.push('/orders')">{{ t('investment.我的背包') }}</AppButton>
     </div>
     <div class="plans-container">
-      <div v-for="(plan, key) in shopList.value" :key="key" class="plan-card">
+      <div v-for="(plan, key) in shopList.value" :key="plan.UAmount" class="plan-card">
         <div class="plan-header">
           <div class="plan-left">
             <h3 class="plan-name">{{ plan.Name }}</h3>
             <div class="plan-usdt">{{ plan.UAmount }} USDT</div>
           </div>
           <div class="plan-right">
-            <div class="plan-power">{{ plan.UAmount }} T</div>
+            <div class="plan-power">{{ plan.Pow }} T</div>
             <div class="power-label">{{ t('investment.power') }}</div>
           </div>
         </div>
@@ -120,7 +120,7 @@ const closePurchaseModal = (): void => {
 
 const handlePurchaseConfirm = async (plan: any) => {
   console.log('Purchase confirmed for plan',)
-  showSuccess(`Successfully purchased !`)
+  showSuccess(t('orders.购买成功'))
   await setApiUserInfo(walletState.value.account);
   chainUserInfo.value = walletState.value.chainUserInfo;
   let chainInfo = await Instance.value.getAssetAndApprovalInfo(walletState.value.account);
@@ -128,31 +128,67 @@ const handlePurchaseConfirm = async (plan: any) => {
 }
 
 
-const fetchData = async () => {
-  try {
-    const response = await request.post(`/VoteInfo`)
-    shopList.value = response.data;
+// const fetchData = async () => {
+//   try {
+//     const response = await request.post(`/VoteInfo`)
+//     shopList.value = response.data;
 
-    apiUserInfo.value = walletState.value.apiUserInfo;
-    hasInviteAddress.value = apiUserInfo.value.PAddr ? true : false;
-    chainUserInfo.value = walletState.value.chainUserInfo;
-    // let chainPrice = await Instance.value.getTokenPrice();
-    let apiPrice = walletState.value.apiPrice;
-    price.value = apiPrice.toString();
-    console.log('shopList.value', shopList.value, chainUserInfo.value)
-  } catch (error) {
-    console.error('Failed to fetch data:', error)
-  }
+//     apiUserInfo.value = walletState.value.apiUserInfo;
+//     hasInviteAddress.value = apiUserInfo.value.PAddr ? true : false;
+//     chainUserInfo.value = walletState.value.chainUserInfo;
+//     // let chainPrice = await Instance.value.getTokenPrice();
+//     let apiPrice = walletState.value.apiPrice;
+//     price.value = apiPrice.toString();
+//     console.log('shopList.value', shopList.value, chainUserInfo.value)
+//   } catch (error) {
+//     console.error('Failed to fetch data:', error)
+//   }
+// }
+// watch(() => walletState.value.isConnected, (connected) => {
+//   if (connected) {
+//     fetchData()
+//   }
+// })
+// onMounted(() => {
+//   if (walletState.value.isConnected) {
+//     fetchData()
+//   }
+// })
+
+
+// 监听 walletState 中需要响应的数据变化
+const setupWalletStateWatchers = () => {
+
+  // 监听 apiUserInfo 变化
+  watch(() => walletState.value.apiUserInfo, (newApiUserInfo) => {
+    apiUserInfo.value = newApiUserInfo
+    hasInviteAddress.value = !!newApiUserInfo?.PAddr
+  }, { deep: true })
+
+  // 监听 chainUserInfo 变化
+  watch(() => walletState.value.chainUserInfo, (newChainUserInfo) => {
+    chainUserInfo.value = newChainUserInfo
+  }, { deep: true })
+
+  // 监听 apiPrice 变化
+  watch(() => walletState.value.apiPrice, (newApiPrice) => {
+    price.value = newApiPrice?.toString() || ''
+  })
 }
-watch(() => walletState.value.isConnected, (connected) => {
-  if (connected) {
-    fetchData()
-  }
-})
-onMounted(() => {
-  if (walletState.value.isConnected) {
-    fetchData()
-  }
+
+onMounted(async () => {
+  const response = await request.post(`/VoteInfo`)
+  shopList.value = response.data
+  console.log('shopList.value', shopList.value, chainUserInfo.value)
+
+  // 设置监听
+  setupWalletStateWatchers()
+
+  // 初始化状态（如果 walletState 已有初始值）
+  apiUserInfo.value = walletState.value.apiUserInfo
+  hasInviteAddress.value = !!walletState.value.apiUserInfo?.PAddr
+  chainUserInfo.value = walletState.value.chainUserInfo
+  price.value = walletState.value.apiPrice?.toString() || ''
 })
 </script>
 

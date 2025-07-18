@@ -15,7 +15,7 @@
           </div>
           <div class="stat-item">
             <div class="stat-value purple">{{ formatNumber(walletState.apiUserInfo.Ua.TeamPerformance) }}</div>
-            <div class="stat-label">{{ t('team.团队业绩') }} (TIG)</div>
+            <div class="stat-label">{{ t('team.团队业绩') }}</div>
           </div>
         </div>
       </div>
@@ -115,6 +115,7 @@ const fetchData = async () => {
     const res = await request.post(`/Team?addr=${walletState.value.account}&limit=${team.value.limit}&size=${team.value.size}`);
     let teamInfo = {
       ...res.data,
+      total:res.data.total==0?8:res.data.total
     }
     team.value = teamInfo;
   } catch (error) {

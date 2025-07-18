@@ -5,6 +5,11 @@ export const currentLang = ref<Language>("zh")
 
 export const translations: Translations = {
   zh: {
+    tx:{
+      交易成功:"交易成功",
+      交易失败:"交易失败",
+      暂无收益:"暂无收益",
+    },
     header: {
       title: "算力商城",
       connect: "连接钱包",
@@ -78,6 +83,7 @@ export const translations: Translations = {
       nosPrice: "NOS价格",
       balanceAfterPayment: "支付后余额",
       cancel: "取消",
+      授权:"授权"
     },
     orders: {
       title: "我的订单",
@@ -110,6 +116,7 @@ export const translations: Translations = {
       completedDays: "已完成天数",
       remainingDays: "剩余天数",
       completionRate: "完成率",
+      
       close: "关闭",
       status: {
         label: "状态",
@@ -117,7 +124,8 @@ export const translations: Translations = {
         completed: "已完成",
         cancelled: "已取消",
       },
-      已释放天数: "已释放天数"
+      已释放天数: "已释放天数",
+      购买成功:"购买成功"
     },
     wallet: {
       title: "提取收益",
@@ -168,9 +176,15 @@ export const translations: Translations = {
       levelRequirements: "等级要求",
       current: "当前",
       reward: "奖励",
+      B区业绩5万U:"B区业绩5万U",
     },
   },
   en: {
+    tx:{
+      交易成功:"Successful transaction",
+      交易失败:"Transaction Failure",
+      暂无收益:"No income yet",
+    },
     header: {
       title: "Mining Mall",
       connect: "Connect Wallet",
@@ -237,13 +251,14 @@ export const translations: Translations = {
       planDetails: "Plan Details",
       paymentInfo: "Payment Information",
       plan: "Plan",
-      power: "Hash Power",
+      power: "Power",
       expected团队业绩: "Expected Team Earnings",
       needToPay: "Amount Due",
       myNOS: "My NOS",
       nosPrice: "NOS Price",
-      balanceAfterPayment: "Balance After Payment",
+      balanceAfterPayment: "Balance After",
       cancel: "Cancel",
+       授权:"Approve"
     },
     orders: {
       title: "My Orders",
@@ -283,7 +298,8 @@ export const translations: Translations = {
         completed: "Completed",
         cancelled: "Cancelled",
       },
-      已释放天数: "Released Days"
+      已释放天数: "Released Days",
+       购买成功:"Successfully purchased !"
     },
     wallet: {
       title: "Withdraw Earnings",
@@ -334,6 +350,7 @@ export const translations: Translations = {
       levelRequirements: "Level Requirements",
       current: "Current",
       reward: "Reward",
+      B区业绩5万U:'B Zone Performance 50,000 U'
     },
   },
 }

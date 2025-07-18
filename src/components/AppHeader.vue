@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch ,} from 'vue'
 import { t, changeLanguage } from '@/utils/i18n'
 import { useEthers } from '@/composables/useWallet'
 import type { Language } from '@/types'
@@ -50,9 +50,17 @@ const handleWalletConnection = async (): Promise<void> => {
 }
 
 onMounted(() => {
+  console.log("--------onMounted-----------")
   // Any additional setup can be done here
   handleWalletConnection();
 })
+watch(() => walletState.value.isConnected, (connected) => {
+  console.log("--------watch-----------",connected)
+  if (connected) {
+    handleWalletConnection();
+  }
+})
+
 </script>
 
 <style scoped>
@@ -96,7 +104,7 @@ onMounted(() => {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: white;
-  padding: 0.5rem;
+  padding: 10px 20px;
   border-radius: 6px;
 }
 

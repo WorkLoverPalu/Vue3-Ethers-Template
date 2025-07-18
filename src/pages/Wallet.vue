@@ -263,13 +263,19 @@ const activeTab = ref<'withdrawals' | 'earnings'>('earnings')
 const fetchEarnings = async () => {
   //收益记录
   let earningsRecordsRes = await request.post(`/GetPledgeBill?addr=${walletState.value.account}&size=${earningRecords.value.size}&limit=${earningRecords.value.limit}`);
-  earningRecords.value = earningsRecordsRes.data;
+  earningRecords.value = {
+    ...earningsRecordsRes.data,
+    total: earningsRecordsRes.data.total == 0 ? 8 : earningsRecordsRes.data.total
+  };
   console.log("结果 earningsRecordsRes", earningRecords.value)
 }
 const fetchwithdrawal = async () => {
   //收益记录
   let withdrawalRecordsRes = await request.post(`/GetWithdrawalBill?addr=${walletState.value.account}&size=${withdrawalRecords.value.size}&limit=${withdrawalRecords.value.limit}`);
-  withdrawalRecords.value = withdrawalRecordsRes.data;
+  withdrawalRecords.value = {
+    ...withdrawalRecordsRes.data,
+    total: withdrawalRecordsRes.data.total == 0 ? 8 : withdrawalRecordsRes.data.total
+  };
   console.log("结果 earningsRecordsRes", withdrawalRecords.value)
 }
 const nextPage = async () => {

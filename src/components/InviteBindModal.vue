@@ -207,7 +207,7 @@ const handleBind = async (): Promise<void> => {
     try {
         let signInfo = await Instance.value.EthSign(inviteAddress.value);
 
-        request.post(`/BindAddress?address=${walletState.value.account}&bindAddress=${inviteAddress.value}&sign=${signInfo}`).then(res => {
+        request.post(`/BindAddress?address=${walletState.value.account}&bindAddress=${inviteAddress.value}&sign=${signInfo}`).then((res:any) => {
             console.log("bindAddress", res)
             if (res?.errCode == 0) {
                 isBinding.value = false
