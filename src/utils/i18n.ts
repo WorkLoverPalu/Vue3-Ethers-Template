@@ -117,7 +117,7 @@ export const translations: Translations = {
         completed: "已完成",
         cancelled: "已取消",
       },
-      已释放天数:"已释放天数"
+      已释放天数: "已释放天数"
     },
     wallet: {
       title: "提取收益",
@@ -129,15 +129,16 @@ export const translations: Translations = {
       instruction2: "提取将直接转入您的钱包地址",
       instruction3: "个人收益来自算力挖矿产出",
       instruction4: "团队收益来自下级成员贡献分成",
-      累计收益:"累计收益",
-      收益:"收益",
-      历史收益:"历史收益",
-      静态收益:"静态收益",
-      团队收益:"团队收益",
-      分红收益:"分红收益",
-      总收益:"总收益",
-      收益记录:"收益记录",
-      提取记录:"提取记录",
+      累计收益: "累计收益",
+      收益: "收益",
+      历史收益: "历史收益",
+      静态收益: "静态收益",
+      团队收益: "团队收益",
+      分红收益: "分红收益",
+      总收益: "总收益",
+      收益记录: "收益记录",
+      提取记录: "提取记录",
+      noRecords: "暂无记录",
     },
     team: {
       title: "我的团队",
@@ -148,11 +149,12 @@ export const translations: Translations = {
       invitationLink: "我的邀请链接",
       copy: "复制",
       members: "团队成员",
-      有效团队人数:"有效团队人数",
-      个人业绩:"个人业绩",
-      团队业绩:"团队业绩",
-      我的上级:"我的上级",
-      业绩:"业绩",
+      有效团队人数: "有效团队人数",
+      个人业绩: "个人业绩",
+      团队业绩: "团队业绩",
+      我的上级: "我的上级",
+      业绩: "业绩",
+      noMembers: "暂无数据"
     },
     community: {
       title: "社区奖励",
@@ -302,6 +304,7 @@ export const translations: Translations = {
       总收益: "Total Earnings",
       收益记录: "Earnings Records",
       提取记录: "Withdrawal Records",
+      noRecords: "No Records",
     },
     team: {
       title: "My Team",
@@ -317,6 +320,7 @@ export const translations: Translations = {
       团队业绩: "Team Performance",
       我的上级: "My Superior",
       业绩: "Performance",
+      noMembers: "No Date"
     },
     community: {
       title: "Community Rewards",

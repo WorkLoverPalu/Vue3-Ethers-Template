@@ -177,7 +177,7 @@
 <script setup lang="ts">
 import { ref, reactive, watch, onMounted, computed } from 'vue'
 import { t } from '@/utils/i18n'
-import { formatDate, formatNumber, sleep } from '@/utils/helpers'
+import { formatNumber } from '@/utils/formatters'
 import AppButton from '@/components/AppButton.vue'
 import { useEthers } from '@/composables/useWallet'
 import request from '@/utils/request'
@@ -208,7 +208,7 @@ const withdrawalRecords = ref(
   {
     limit: 8,
     "size": 0,
-    "total": 0,
+    "total": 8,
     "Sum": null,
     "dataList": [
     ]
@@ -218,7 +218,7 @@ const earningRecords = ref(
   {
     limit: 8,
     "size": 0,
-    "total": 0,
+    "total": 8,
     "Sum": null,
     "dataList": [
     ]

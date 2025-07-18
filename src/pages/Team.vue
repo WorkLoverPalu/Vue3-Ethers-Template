@@ -97,7 +97,7 @@ const invitationLink = ref(null);
 const team = ref<any>({
   "limit": 8,
   "size": 0, // current page (0-based)
-  "total": 0,
+  "total": 8,
   "dataList": []
 })
 

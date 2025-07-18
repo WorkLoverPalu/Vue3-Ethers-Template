@@ -39,7 +39,7 @@
           <div class="order-progress">
             <div class="progress-info">
               <span class="progress-label">{{ t('orders.progress') }}</span>
-              <span class="progress-text">{{ order.SucDay }}/{{ 600 }} {{ t('orders.days') }}</span>
+              <span class="progress-text">{{ order.SucDay||0 }} / {{ 600 }} {{ t('orders.days') }}</span>
             </div>
             <div class="progress-bar">
               <div class="progress-fill" :style="{ width: `${(order.SucDay / 600) * 100}%` }"></div>

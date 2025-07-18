@@ -7,7 +7,7 @@
         <div class="level-display">
           <div class="level-badge">Lv {{ walletState.apiUserInfo.Ua.Level }}</div>
           <div class="level-reward">{{ t('community.feeReward') }}:
-            {{ levelRequirements[walletState.apiUserInfo.Ua.Level].reward }} %</div>
+            {{ levelRequirements[walletState.apiUserInfo.Ua.Level*1].reward }} %</div>
 
         </div>
       </div>
