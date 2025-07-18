@@ -20,7 +20,7 @@
         <div class="plan-details">
           <div class="detail-row">
             <span class="detail-label">{{ t('investment.dailyAdaptation') }}:</span>
-            <span class="detail-value">1/{{ plan.MaxDay }}</span>
+            <span class="detail-value">1 / {{ plan.MaxDay }}</span>
           </div>
           <div class="detail-row">
             <span class="detail-label">{{ t('investment.收益天数') }}:</span>
@@ -56,13 +56,11 @@ import AppButton from '@/components/AppButton.vue'
 import PurchaseModal from '@/components/PurchaseModal.vue'
 import InviteBindModal from '@/components/InviteBindModal.vue'
 import { useEthers } from '@/composables/useWallet'
-import { userStore } from '@/stores/user'
 import request from '@/utils/request'
 import { useToast } from '@/stores/useToast'
 
 const { showSuccess, showError } = useToast()
-const { walletState, Instance } = useEthers()
-const useUserStore = userStore();
+const { walletState, Instance, setApiUserInfo, setChainUserInfo } = useEthers()
 const showInviteBindModal = ref(false)
 const showPurchaseModal = ref(false)
 const selectedPlan = ref<any | null>(null)
@@ -120,20 +118,26 @@ const closePurchaseModal = (): void => {
   selectedPlan.value = null
 }
 
-const handlePurchaseConfirm = (plan: any): void => {
+const handlePurchaseConfirm = async (plan: any) => {
   console.log('Purchase confirmed for plan',)
   showSuccess(`Successfully purchased !`)
+  await setApiUserInfo(walletState.value.account);
+  chainUserInfo.value = walletState.value.chainUserInfo;
+  let chainInfo = await Instance.value.getAssetAndApprovalInfo(walletState.value.account);
+  await setChainUserInfo(chainInfo);
 }
 
 
 const fetchData = async () => {
   try {
-    shopList.value = await useUserStore.getShopList();
-    apiUserInfo.value = await useUserStore.getUserInfo(walletState.value.account);
+    const response = await request.post(`/VoteInfo`)
+    shopList.value = response.data;
+
+    apiUserInfo.value = walletState.value.apiUserInfo;
     hasInviteAddress.value = apiUserInfo.value.PAddr ? true : false;
-    chainUserInfo.value = await Instance.value.getAssetAndApprovalInfo(walletState.value.account);
+    chainUserInfo.value = walletState.value.chainUserInfo;
     // let chainPrice = await Instance.value.getTokenPrice();
-    let apiPrice = await useUserStore.getPrice();
+    let apiPrice = walletState.value.apiPrice;
     price.value = apiPrice.toString();
     console.log('shopList.value', shopList.value, chainUserInfo.value)
   } catch (error) {

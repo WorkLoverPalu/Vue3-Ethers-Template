@@ -84,8 +84,7 @@ import { sleep } from '@/utils/formatters'
 import AppButton from '@/components/AppButton.vue'
 import { useEthers } from '@/composables/useWallet'
 const { walletState, Instance } = useEthers()
-import { userStore } from '@/stores/user'
-
+import request from '@/utils/request'
 interface ValidationResult {
     valid: boolean
     inviterName?: string
@@ -103,7 +102,6 @@ interface Emits {
 
 defineProps<Props>()
 const emit = defineEmits<Emits>()
-const useUserStore = userStore();
 const inviteAddress = ref('')
 const hasError = ref(false)
 const errorMessage = ref('')
@@ -208,11 +206,8 @@ const handleBind = async (): Promise<void> => {
 
     try {
         let signInfo = await Instance.value.EthSign(inviteAddress.value);
-        useUserStore.bindAddress(
-            walletState.value.account,
-            inviteAddress.value,
-            signInfo,
-        ).then(res => {
+
+        request.post(`/BindAddress?address=${walletState.value.account}&bindAddress=${inviteAddress.value}&sign=${signInfo}`).then(res => {
             console.log("bindAddress", res)
             if (res?.errCode == 0) {
                 isBinding.value = false
