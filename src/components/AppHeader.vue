@@ -106,6 +106,7 @@ watch(() => walletState.value.isConnected, (connected) => {
   color: white;
   padding: 10px 20px;
   border-radius: 6px;
+  height: 40px;
 }
 
 .connect-btn {

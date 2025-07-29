@@ -9,6 +9,7 @@ export const translations: Translations = {
       交易成功:"交易成功",
       交易失败:"交易失败",
       暂无收益:"暂无收益",
+      approveS:"授权成功",
     },
     header: {
       title: "算力商城",
@@ -184,6 +185,7 @@ export const translations: Translations = {
       交易成功:"Successful transaction",
       交易失败:"Transaction Failure",
       暂无收益:"No income yet",
+      approveS:"Authorization successful",
     },
     header: {
       title: "Mining Mall",

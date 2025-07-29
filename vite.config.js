@@ -18,7 +18,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/tig': {
-        target: 'http://192.168.3.197:8103',
+        target: 'http://152.32.187.88:9000',
         changeOrigin: true,
       }
     }

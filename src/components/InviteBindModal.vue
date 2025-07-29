@@ -21,7 +21,7 @@
                     <label class="input-label">{{ t('invite.inviteAddress') }}</label>
                     <div class="input-container">
 
-                        <input v-model="inviteAddress" name="" id="" type="textarea" rows="20"
+                        <input v-model.trim="inviteAddress" name="" id="" type="textarea" rows="20"
                             :placeholder="t('invite.addressPlaceholder')" class="address-input"
                             :class="{ 'error': hasError }" @input="clearError" @paste="handlePaste"></input>
 
@@ -85,6 +85,10 @@ import AppButton from '@/components/AppButton.vue'
 import { useEthers } from '@/composables/useWallet'
 const { walletState, Instance } = useEthers()
 import request from '@/utils/request'
+import { useToast } from '@/stores/useToast'
+
+const { showSuccess, showError } = useToast()
+
 interface ValidationResult {
     valid: boolean
     inviterName?: string
@@ -207,7 +211,7 @@ const handleBind = async (): Promise<void> => {
     try {
         let signInfo = await Instance.value.EthSign(inviteAddress.value);
 
-        request.post(`/BindAddress?address=${walletState.value.account}&bindAddress=${inviteAddress.value}&sign=${signInfo}`).then((res:any) => {
+        request.post(`/BindAddress?address=${walletState.value.account}&bindAddress=${inviteAddress.value}&sign=${signInfo}`).then((res: any) => {
             console.log("bindAddress", res)
             if (res?.errCode == 0) {
                 isBinding.value = false
@@ -224,6 +228,7 @@ const handleBind = async (): Promise<void> => {
         console.log("error", error)
         hasError.value = true
         errorMessage.value = t('invite.bindError')
+        showError(error.message || t('invite.bindError'))
     } finally {
         isBinding.value = false
     }

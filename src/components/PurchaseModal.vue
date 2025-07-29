@@ -126,7 +126,6 @@ const handleConfirm = async (): Promise<void> => {
     isProcessing.value = true
 
     try {
-
         if (props.selectedPlan.nosAllowance >= props.selectedPlan.needAmount) {
             let buyApiRes = await request.post(`/Pledge?id=${props.selectedPlan.Id}&addr=${walletState.value.account}`);
             console.log("res", buyApiRes)
@@ -142,14 +141,16 @@ const handleConfirm = async (): Promise<void> => {
 
             emit('confirm', props.selectedPlan)
             emit('close')
+            
         } else {
             const tx = await Instance.value.approve();
             await tx.wait()
+            showSuccess(t('tx.approveS'))
             return emit('approve')
         }
     } catch (error) {
         console.error('Purchase failed:', error)
-        showError(error.message || '交易失败')
+        showError(error.message || t('tx.交易失败'))
     } finally {
         isProcessing.value = false
     }
