@@ -65,8 +65,10 @@ export class StakingContractService {
     async getTokenPrice(): Promise<{ price: string }> {
         try {
             const res = await this.StakingContract.getTokenPrice();
+            let chainPrice = formatNumber(formatUnits(res));
+            console.log("chainPrice", chainPrice);
             return {
-                price: formatNumber(formatUnits(res))
+                price: (chainPrice).toString()
             }
         } catch (error) {
             throw new Error(error);

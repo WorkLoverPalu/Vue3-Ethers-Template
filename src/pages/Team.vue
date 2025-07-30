@@ -6,7 +6,7 @@
         <h3 class="section-title">{{ t('team.statistics') }}</h3>
         <div class="stats-row">
           <div class="stat-item">
-            <div class="stat-value cyan">{{ team.total }}</div>
+            <div class="stat-value cyan">{{ walletState.apiUserInfo.Ua.People }}</div>
             <div class="stat-label">{{ t('team.有效团队人数') }}</div>
           </div>
           <div class="stat-item">
